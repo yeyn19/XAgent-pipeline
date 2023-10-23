@@ -1,5 +1,5 @@
 
-from enum import Enum, unique
+from enum import Enum, unique, auto
 import abc
 from colorama import Fore, Style
 import json
@@ -66,6 +66,17 @@ class TaskStatusCode(Enum):
     SUCCESS = 2
     FAIL = 3
     SPLIT = 4 
+
+@unique
+class AutoMatEdgeType(Enum):
+    RuleBased = auto() 
+    NaturalLanguageBased = auto()
+
+
+@unique
+class AutoMatStateChangeHardness(Enum):
+    """描述自动机选边的困难程度，用来在运行时选择状态转移消耗的资源"""
+    GPT4 = auto()
 
 @unique
 class RequiredAbilities(Enum):

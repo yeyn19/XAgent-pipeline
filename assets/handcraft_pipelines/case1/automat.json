@@ -1,0 +1,41 @@
+{
+    "meta": {
+        "name": "",
+        "purpose": "",
+        "author": ""
+    },
+    "nodes": [
+        {
+            "node_name": "start",
+            "tool_name": "",
+            "tool_type": "pipeline"
+        },
+        {
+            "node_name": "google sheet read",
+            "tool_name": "googleSheets.sheet.read",
+            "tool_type": "n8n"
+        },
+        {
+            "node_name": "send gmail",
+            "tool_name": "gmail.message.send",
+            "tool_type": "n8n"
+        },   
+        {
+            "node_name": "slack send message",
+            "tool_name": "slack.message.post",
+            "tool_type": "n8n"
+        }
+    ],
+
+
+    "edges":[
+        {
+            "edge_name":"1",
+            "from_node": "start",
+            "to_node": "google sheet read",
+            "rule_based_select": true,
+            "given_all_params": true,
+            "nl_suggestions": []
+        }
+    ]
+}

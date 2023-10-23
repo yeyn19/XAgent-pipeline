@@ -13,9 +13,6 @@ from XAgent.message_history import Message
 from XAgent.tool_call_handle import function_handler, toolserver_interface
 from XAgent.utils import SearchMethodStatusCode, ToolCallStatusCode
 from XAgent.data_structure.plan import Plan
-NOW_SUBTASK_PROMPT = '''
-
-'''
 
 
 def make_message(now_node: ToolNode, task_handler, max_length, config):

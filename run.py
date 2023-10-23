@@ -1,8 +1,13 @@
 import os
 import sys
 import argparse
+import json
 
 from XAgent.config import CONFIG
+from XAgent.inner_loop_search_algorithms.run_automat import AutoMatRunner
+from XAgent.data_structure.pipeline_automat import PipelineAutoMat
+from XAgent.tools.n8n_tools.n8n_compiler import n8nCompiler
+from XAgent.tools.n8n_tools.n8n_param_system import n8nParamSystem
 from command import CommandLine,XAgentServerEnv
 
 def parse_args():
@@ -30,17 +35,30 @@ def parse_args():
     return args
 
 if __name__ == '__main__':
-    args = parse_args()
-    CONFIG.reload(args.config_file)
-    CONFIG.default_completion_kwargs['model']  = args.model
-    CONFIG.enable_ask_human_for_help = args.enable_ask_human_for_help
-    CONFIG.max_subtask_chain_length = args.max_subtask_chain_length
-    CONFIG.max_plan_refine_chain_length = args.max_plan_refine_chain_length
-    CONFIG.max_plan_tree_depth = args.max_plan_tree_depth
-    CONFIG.max_plan_tree_width = args.max_plan_tree_width
-    CONFIG.max_retry_times = args.max_retry_times   
+    # args = parse_args()
+    # CONFIG.reload(args.config_file)
+    # CONFIG.default_completion_kwargs['model']  = args.model
+    # CONFIG.enable_ask_human_for_help = args.enable_ask_human_for_help
+    # CONFIG.max_subtask_chain_length = args.max_subtask_chain_length
+    # CONFIG.max_plan_refine_chain_length = args.max_plan_refine_chain_length
+    # CONFIG.max_plan_tree_depth = args.max_plan_tree_depth
+    # CONFIG.max_plan_tree_width = args.max_plan_tree_width
+    # CONFIG.max_retry_times = args.max_retry_times   
 
-
+    # y = n8nParamSystem()
+    # y.from_json()
+    # exit()
+    pipeline_dir = "./assets/handcraft_pipelines/case1"
+    file = "assets.handcraft_pipelines.case1.rule"
+    with open(os.path.join(pipeline_dir,"automat.json")) as reader:
+        pipeline_json_data = json.load(reader)
+    pipeline = PipelineAutoMat.from_json(
+        json_data=pipeline_json_data,
+        rule_file_name=file,
+    )
+    runner = AutoMatRunner(pipeline=pipeline)
+    runner.run()
+    exit()
 
     cmd = CommandLine(XAgentServerEnv)
     if args.quiet:
