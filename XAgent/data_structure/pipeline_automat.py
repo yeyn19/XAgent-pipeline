@@ -12,7 +12,6 @@ from XAgent.utils import AutoMatEdgeType, AutoMatStateChangeHardness, ToolType, 
 from XAgent.tools.param_system import ParamSystem
 from XAgent.tools.param_system_interface import get_param_system
 from XAgent.loggers.logs import logger
-from XAgent.data_structure.runtime_user_interface import RuntimeStackUserInterface
 
 
 
@@ -124,6 +123,7 @@ class PipelineMeta():
             name=meta_data["name"],
             purpose=meta_data["purpose"],
             author=meta_data["author"],
+            params = meta_data["params"]
         )
 
 class PipelineAutoMat():
@@ -143,7 +143,6 @@ class PipelineAutoMat():
     def from_json(json_data: dict, rule_file_name:str):
         automat = PipelineAutoMat()
         automat.meta = PipelineMeta.from_json(json_data["meta"])
-        automat.params = json_data["params"]
         for node in json_data["nodes"]:
             new_node = PipelineAutoMatNode.from_json(node)
             new_node.param_interface = get_param_system(new_node.tool_name, new_node.tool_type)
@@ -155,12 +154,12 @@ class PipelineAutoMat():
                 # 获取函数并将其绑定为实例方法
                 func = getattr(module, function_name)
                 new_node.route = types.MethodType(func, new_node)
-                logger.typewriter_log(f"node {new_node.node_name} find existing route-function")
+                logger.typewriter_log(f"node \"{new_node.node_name}\"({new_node.tool_name}):",Fore.BLUE, "find existing route-function")
             else:
-                logger.typewriter_log(f"edge {new_node.node_name} use default route-function")
+                logger.typewriter_log(f"node \"{new_node.node_name}\"({new_node.tool_name}):",Fore.BLUE, "use default route-function")
 
             automat.nodes.append(new_node)
-            if node.tool_type == "control" and node.tool_name == "start":
+            if new_node.tool_type == ToolType.ControlflowTool and new_node.tool_name == "start":
                 automat.start_node = new_node
             
         for edge in json_data["edges"]:
@@ -176,9 +175,9 @@ class PipelineAutoMat():
                 # 获取函数并将其绑定为实例方法
                 func = getattr(module, function_name)
                 edge_data.route = types.MethodType(func, edge_data)
-                logger.typewriter_log(f"edge {edge_data.edge_name} find existing route-function")
+                logger.typewriter_log(f"edge \"{edge_data.edge_name}\":",Fore.BLUE, "find existing route-function")
             else:
-                logger.typewriter_log(f"edge {edge_data.edge_name} use default route-function")
+                logger.typewriter_log(f"edge \"{edge_data.edge_name}\":",Fore.BLUE,  "use default route-function")
             
 
             from_name = edge["from_node"]
@@ -194,7 +193,7 @@ class PipelineAutoMat():
             edge_data.from_node.out_edges.append(edge_data)
 
         for node in automat.nodes:
-            automat.edges.append(PipelineAutoMatEdge.get_defualt_ReACT_branch(from_node=node))
+            node.out_edges.append(PipelineAutoMatEdge.get_defualt_ReACT_branch(from_node=node))
         return automat
 
 

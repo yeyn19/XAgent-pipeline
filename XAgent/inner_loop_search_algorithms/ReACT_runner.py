@@ -7,7 +7,6 @@ from XAgent.agent.base_agent import BaseAgent
 from XAgent.agent.summarize import summarize_action,summarize_plan,clip_text,get_token_nums
 from XAgent.data_structure.node import ToolNode
 from XAgent.data_structure.tree import TaskSearchTree
-from XAgent.inner_loop_search_algorithms.base_search import BaseSearchMethod
 from XAgent.loggers.logs import logger, print_assistant_thoughts
 from XAgent.message_history import Message
 from XAgent.tool_call_handle import function_handler, toolserver_interface
@@ -39,7 +38,7 @@ def make_message(now_node: ToolNode, task_handler, max_length, config):
     return message_sequence
 
 
-class ReACTChainSearch(BaseSearchMethod):
+class ReACTChainSearch():
     def __init__(self):
         super().__init__()
 

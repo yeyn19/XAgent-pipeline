@@ -4,7 +4,7 @@ import argparse
 import json
 
 from XAgent.config import CONFIG
-from XAgent.inner_loop_search_algorithms.run_automat import AutoMatRunner
+from XAgent.inner_loop_search_algorithms.pipeline_runner import run_pipeline
 from XAgent.data_structure.pipeline_automat import PipelineAutoMat
 from XAgent.tools.n8n_tools.n8n_compiler import n8nCompiler
 from XAgent.tools.n8n_tools.n8n_param_system import n8nParamSystem
@@ -56,8 +56,7 @@ if __name__ == '__main__':
         json_data=pipeline_json_data,
         rule_file_name=file,
     )
-    runner = AutoMatRunner(pipeline=pipeline)
-    runner.run()
+    run_pipeline(pipeline)
     exit()
 
     cmd = CommandLine(XAgentServerEnv)

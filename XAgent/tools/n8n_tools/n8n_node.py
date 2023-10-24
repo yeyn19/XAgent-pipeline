@@ -103,5 +103,5 @@ class n8nPythonNode():
         tool_status = n8nParamParseStatus.ParamParseSuccess
 
         self.update_implement_info()
-        return tool_status, json.dumps({"result": tool_call_result, "status": tool_status.name})
+        return tool_status, {"result": tool_call_result, "status": tool_status.name}
 

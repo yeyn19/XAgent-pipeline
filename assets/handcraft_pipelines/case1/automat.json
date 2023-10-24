@@ -2,15 +2,15 @@
     "meta": {
         "name": "",
         "purpose": "",
-        "author": ""
-    },
-    "params": {
+        "params": {
 
+        },
+        "author": ""
     },
     "nodes": [
         {
             "node_name": "start",
-            "tool_name": "",
+            "tool_name": "start",
             "tool_type": "control"
         },
         {
@@ -35,7 +35,7 @@
         {
             "edge_name":"1",
             "from_node": "start",
-            "to_node": "google sheet read",
+            "to_node": "slack send message",
             "comments": []
         }
     ]

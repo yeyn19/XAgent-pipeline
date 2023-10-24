@@ -25,8 +25,8 @@ class ParamSystem(ABC):
         """
         pass
 
-    @abstractmethod
     @property
+    @abstractmethod
     def param_sufficient(self):
         """检测已提供参数是否可以正确执行工具
         """
