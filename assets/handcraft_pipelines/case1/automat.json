@@ -4,11 +4,14 @@
         "purpose": "",
         "author": ""
     },
+    "params": {
+
+    },
     "nodes": [
         {
             "node_name": "start",
             "tool_name": "",
-            "tool_type": "pipeline"
+            "tool_type": "control"
         },
         {
             "node_name": "google sheet read",
@@ -33,9 +36,7 @@
             "edge_name":"1",
             "from_node": "start",
             "to_node": "google sheet read",
-            "rule_based_select": true,
-            "given_all_params": true,
-            "nl_suggestions": []
+            "comments": []
         }
     ]
 }

@@ -1,24 +1,29 @@
 """node里存储运行时信息
 """
 from __future__ import annotations
-from typing import List, Optional
+from typing import List, Optional, Any
 from colorama import Fore, Style
 from dataclasses import dataclass, field
 import importlib
 import uuid
 import types
 
-from XAgent.utils import AutoMatEdgeType, AutoMatStateChangeHardness
+from XAgent.utils import AutoMatEdgeType, AutoMatStateChangeHardness, ToolType, ToolCallStatusCode
 from XAgent.tools.param_system import ParamSystem
 from XAgent.tools.param_system_interface import get_param_system
 from XAgent.loggers.logs import logger
 from XAgent.data_structure.runtime_user_interface import RuntimeStackUserInterface
 
 
+
+
 @dataclass
 class RuntimeTool():
     """用来存储工具调用的运行时信息
     """
+    status: ToolCallStatusCode
+    output_data: Any
+
 
 @dataclass
 class RuntimeNode():
@@ -30,14 +35,15 @@ class RuntimeNode():
     tool_call_info: Optional[RuntimeTool] = None
 
 
-@dataclass
-class RuntimeChain():
-    """数据类，存储原始的工具调用链
-    和Pipeline运行交互
+class RuntimeStackUserInterface():
+    """暴露给用户来开发Pipeline-rule functions的接口
+    1.实现一定要简单易懂
+    2.存储运行时的信息
+    3.可以设计一些low-code的辅助函数来帮助进行Pipeline设计
     """
-    tool_call_stack: List[RuntimeNode] = field(default_factory=list)
-
-
+    def __init__(self):
+        self.runtime_data: List[RuntimeNode] = []
+        self.global_data = {}
 
 
 @dataclass
@@ -45,36 +51,37 @@ class PipelineAutoMatNode():
     """一个自动机节点"""
     node_name: str
     tool_name: str
-    tool_type: str
+    tool_type: ToolType
     state_change_hardness: AutoMatStateChangeHardness = AutoMatStateChangeHardness.GPT4
 
+    param_interface: Optional[ParamSystem] = None
     """存储该节点在运行时的访问情况"""
     runtime_stack: List = field(default_factory=list)
+
+    out_edges: List["PipelineAutoMatEdge"] = field(default_factory=list)
     
     @staticmethod
     def from_json(node):
         new_node = PipelineAutoMatNode(
                         node_name=node["node_name"],
                         tool_name=node["tool_name"],
-                        tool_type=node["tool_type"],
+                        tool_type=ToolType(node["tool_type"]),
                     )
         # TODO: other params?
         return new_node
 
     @staticmethod
-    def get_duck_node_for_react():
+    def get_defualt_ReACT_node():
+        """对于所有节点默认添加一个ReACT-node作为指向的节点，来处理异常情况
+        """
         new_node = PipelineAutoMatNode(
                         node_name=uuid.uuid1(),
-                        tool_name=node["tool_name"],
-                        tool_type=node["tool_type"],
+                        tool_name="",
+                        tool_type=ToolType.ReACTTool,
                     )
         # TODO: other params?
         return new_node
 
-    def run(self, param_system: ParamSystem):
-        """进行工具调用
-        """
-        pass
 
 
 @dataclass
@@ -83,18 +90,20 @@ class PipelineAutoMatEdge():
     from_node: Optional[PipelineAutoMatNode] = None
     to_node: Optional[PipelineAutoMatNode] = None
 
-    param_interface: Optional[ParamSystem] = None
+    comments: List[str] = field(default_factory=List)
 
-    rule_type: AutoMatEdgeType = AutoMatEdgeType.NaturalLanguageBased
-    given_all_params: bool = False
-    nl_suggesstions: List[str] = field(default_factory=List)
+    def get_defualt_ReACT_branch(from_node: PipelineAutoMatNode):
+        react_node = PipelineAutoMatNode.get_defualt_ReACT_node()
+        new_edge = PipelineAutoMatEdge(
+            edge_name=f"exception_edge_for_{from_node.node_name}",
+            from_node=from_node,
+            to_node=react_node,
+            comments=[
+                "the default edge to handle exception: route to this edge when all other conditions didn't happen"
+            ]
+        )
 
-    def route(self, runtime_stack: RuntimeStackUserInterface):
-        """选边函数，根据规则来选边：可能是一个user-provided rule，也可以是LLM根据建议自动选边
-        这个函数的实现是从pipeline/rule.py中动态加载的
-        """
-        print("User to be implemented")
-        raise NotImplementedError
+        return new_edge
 
     def to_json(self):
         pass
@@ -106,6 +115,8 @@ class PipelineMeta():
     name: str
     purpose: str
     author: str
+
+    params: dict
     
     @staticmethod
     def from_json(meta_data):
@@ -121,9 +132,9 @@ class PipelineAutoMat():
     
     """
     def __init__(self):
+        self.start_node: PipelineAutoMatNode = None
         self.nodes: List[PipelineAutoMatNode] = []
-        self.edges: List[PipelineAutoMatEdge] = []
-        self.runtime_info: RuntimeChain = None #存储自动机的运行时信息
+        self.runtime_info: RuntimeStackUserInterface = None #存储自动机的运行时信息
 
         self.meta: PipelineMeta = None
 
@@ -132,30 +143,42 @@ class PipelineAutoMat():
     def from_json(json_data: dict, rule_file_name:str):
         automat = PipelineAutoMat()
         automat.meta = PipelineMeta.from_json(json_data["meta"])
+        automat.params = json_data["params"]
         for node in json_data["nodes"]:
-            automat.nodes.append(PipelineAutoMatNode.from_json(node))
+            new_node = PipelineAutoMatNode.from_json(node)
+            new_node.param_interface = get_param_system(new_node.tool_name, new_node.tool_type)
+
+            function_name = f"route_node_{new_node.node_name}"
+            module = importlib.import_module(rule_file_name)
+            # 检查函数是否存在
+            if hasattr(module, function_name):
+                # 获取函数并将其绑定为实例方法
+                func = getattr(module, function_name)
+                new_node.route = types.MethodType(func, new_node)
+                logger.typewriter_log(f"node {new_node.node_name} find existing route-function")
+            else:
+                logger.typewriter_log(f"edge {new_node.node_name} use default route-function")
+
+            automat.nodes.append(new_node)
+            if node.tool_type == "control" and node.tool_name == "start":
+                automat.start_node = new_node
+            
         for edge in json_data["edges"]:
             edge_data = PipelineAutoMatEdge(
                 edge_name=edge["edge_name"],
-                nl_suggesstions=edge["nl_suggestions"],
+                comments=edge["comments"],
             )
-            if edge["rule_based_select"]:
-                edge_data.rule_type = AutoMatEdgeType.RuleBased
-                #加载实际的对象
-                function_name = f"route_{edge_data.edge_name}"
-                logger.info(f"go to find {function_name}")
-                module = importlib.import_module(rule_file_name)
-                # 检查函数是否存在
-                if hasattr(module, function_name):
-                    # 获取函数并将其绑定为实例方法
-                    func = getattr(module, function_name)
-                    edge_data.route = types.MethodType(func, edge_data)
-                else:
-                    raise ValueError(f"Function {function_name} does not exist in {rule_file_name}.py")
-            else:
-                edge_data.rule_type = AutoMatEdgeType.NaturalLanguageBased
 
-            edge_data.given_all_params = edge["given_all_params"]
+            function_name = f"route_edge_{edge_data.edge_name}"
+            module = importlib.import_module(rule_file_name)
+            # 检查函数是否存在
+            if hasattr(module, function_name):
+                # 获取函数并将其绑定为实例方法
+                func = getattr(module, function_name)
+                edge_data.route = types.MethodType(func, edge_data)
+                logger.typewriter_log(f"edge {edge_data.edge_name} find existing route-function")
+            else:
+                logger.typewriter_log(f"edge {edge_data.edge_name} use default route-function")
             
 
             from_name = edge["from_node"]
@@ -167,8 +190,16 @@ class PipelineAutoMat():
                     edge_data.to_node = node
             if edge_data.from_node == None or edge_data.to_node == None:
                 raise NotImplementedError
-
-            edge_data.param_interface = get_param_system(edge_data.to_node.tool_name, edge_data.to_node.tool_type)
             
-            automat.edges.append(edge_data)
+            edge_data.from_node.out_edges.append(edge_data)
+
+        for node in automat.nodes:
+            automat.edges.append(PipelineAutoMatEdge.get_defualt_ReACT_branch(from_node=node))
         return automat
+
+
+@dataclass
+class RouteResult():
+    select_node: PipelineAutoMatNode
+    params: dict
+    param_sufficient: bool
