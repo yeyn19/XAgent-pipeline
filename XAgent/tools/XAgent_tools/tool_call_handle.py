@@ -58,8 +58,9 @@ class ToolServerInterface():
             self.url = config.selfhost_toolserver_url
         else:
             raise NotImplementedError('Please use selfhost toolserver')
-        logger.typewriter_log("ToolServer connected in", Fore.RED, self.url)
+        logger.typewriter_log("ToolServer connected in", Fore.GREEN, self.url)
         response = requests.post(f'{self.url}/get_cookie',)
+
         self.cookies = response.cookies
     def close(self):
         requests.post(f'{self.url}/close_session', cookies=self.cookies)

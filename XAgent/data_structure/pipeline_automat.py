@@ -20,8 +20,25 @@ from XAgent.loggers.logs import logger
 class RuntimeTool():
     """用来存储工具调用的运行时信息
     """
-    status: ToolCallStatusCode
+    tool_output_status_code: ToolCallStatusCode
     output_data: Any
+
+    def log_self(self):
+        if self.tool_output_status_code == ToolCallStatusCode.TOOL_CALL_SUCCESS:
+            color = Fore.GREEN
+        elif self.tool_output_status_code == ToolCallStatusCode.SUBMIT_AS_SUCCESS:
+            color = Fore.YELLOW
+        elif self.tool_output_status_code == ToolCallStatusCode.SUBMIT_AS_FAILED:
+            color = Fore.BLUE
+        else:
+            color = Fore.RED
+
+        logger.typewriter_log(
+            "ToolResult: ", Fore.BLUE, f"{color}{self.output_data}{Style.RESET_ALL}"
+        )
+        logger.typewriter_log(
+            "ToolStatusCode: ", Fore.BLUE, f"{color}{self.tool_output_status_code.name}{Style.RESET_ALL}"
+        )
 
 
 @dataclass
@@ -55,7 +72,7 @@ class PipelineAutoMatNode():
 
     param_interface: Optional[ParamSystem] = None
     """存储该节点在运行时的访问情况"""
-    runtime_stack: List = field(default_factory=list)
+    runtime_stack: List[RuntimeNode] = field(default_factory=list)
 
     out_edges: List["PipelineAutoMatEdge"] = field(default_factory=list)
     
@@ -134,7 +151,7 @@ class PipelineAutoMat():
     def __init__(self):
         self.start_node: PipelineAutoMatNode = None
         self.nodes: List[PipelineAutoMatNode] = []
-        self.runtime_info: RuntimeStackUserInterface = None #存储自动机的运行时信息
+        self.runtime_info: RuntimeStackUserInterface = RuntimeStackUserInterface() #存储自动机的运行时信息
 
         self.meta: PipelineMeta = None
 
@@ -167,19 +184,6 @@ class PipelineAutoMat():
                 edge_name=edge["edge_name"],
                 comments=edge["comments"],
             )
-
-            function_name = f"route_edge_{edge_data.edge_name}"
-            module = importlib.import_module(rule_file_name)
-            # 检查函数是否存在
-            if hasattr(module, function_name):
-                # 获取函数并将其绑定为实例方法
-                func = getattr(module, function_name)
-                edge_data.route = types.MethodType(func, edge_data)
-                logger.typewriter_log(f"edge \"{edge_data.edge_name}\":",Fore.BLUE, "find existing route-function")
-            else:
-                logger.typewriter_log(f"edge \"{edge_data.edge_name}\":",Fore.BLUE,  "use default route-function")
-            
-
             from_name = edge["from_node"]
             to_name = edge["to_node"]
             for node in automat.nodes:
@@ -189,6 +193,18 @@ class PipelineAutoMat():
                     edge_data.to_node = node
             if edge_data.from_node == None or edge_data.to_node == None:
                 raise NotImplementedError
+
+            function_name = f"route_edge_{edge_data.edge_name}"
+            module = importlib.import_module(rule_file_name)
+            # 检查函数是否存在
+            if hasattr(module, function_name):
+                # 获取函数并将其绑定为实例方法
+                func = getattr(module, function_name)
+                edge_data.route = types.MethodType(func, edge_data)
+                logger.typewriter_log(f"edge \"{edge_data.edge_name}\"({edge_data.from_node.node_name} -> {edge_data.to_node.node_name}):",Fore.BLUE, "find existing route-function")
+            else:
+                logger.typewriter_log(f"edge \"{edge_data.edge_name}\"({edge_data.from_node.node_name} -> {edge_data.to_node.node_name}):",Fore.BLUE,  "use default route-function")
+        
             
             edge_data.from_node.out_edges.append(edge_data)
 
@@ -200,5 +216,6 @@ class PipelineAutoMat():
 @dataclass
 class RouteResult():
     select_node: PipelineAutoMatNode
+    select_edge: PipelineAutoMatEdge
     params: dict
     param_sufficient: bool

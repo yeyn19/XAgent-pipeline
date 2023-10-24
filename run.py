@@ -8,6 +8,7 @@ from XAgent.inner_loop_search_algorithms.pipeline_runner import run_pipeline
 from XAgent.data_structure.pipeline_automat import PipelineAutoMat
 from XAgent.tools.n8n_tools.n8n_compiler import n8nCompiler
 from XAgent.tools.n8n_tools.n8n_param_system import n8nParamSystem
+from XAgent.tools.XAgent_tools.tool_call_handle import toolserver_interface
 from command import CommandLine,XAgentServerEnv
 
 def parse_args():
@@ -29,14 +30,14 @@ def parse_args():
     parser.add_argument("--max_plan_tree_depth", type=int, default=CONFIG.max_plan_tree_depth)
     parser.add_argument("--max_plan_tree_width", type=int, default=CONFIG.max_plan_tree_width)
     parser.add_argument("--max_retry_times", type=int, default=CONFIG.max_retry_times)
-    parser.add_argument("--config_file",type=str,default="config.yml")
+    parser.add_argument("--config_file",type=str,default="./assets/private.yml")
 
     args = parser.parse_args()
     return args
 
 if __name__ == '__main__':
     # args = parse_args()
-    # CONFIG.reload(args.config_file)
+    CONFIG.reload("./assets/private.yml")
     # CONFIG.default_completion_kwargs['model']  = args.model
     # CONFIG.enable_ask_human_for_help = args.enable_ask_human_for_help
     # CONFIG.max_subtask_chain_length = args.max_subtask_chain_length
@@ -44,10 +45,10 @@ if __name__ == '__main__':
     # CONFIG.max_plan_tree_depth = args.max_plan_tree_depth
     # CONFIG.max_plan_tree_width = args.max_plan_tree_width
     # CONFIG.max_retry_times = args.max_retry_times   
+    toolserver_interface.lazy_init(CONFIG)
+    output = toolserver_interface.get_available_tools()
 
-    # y = n8nParamSystem()
-    # y.from_json()
-    # exit()
+
     pipeline_dir = "./assets/handcraft_pipelines/case1"
     file = "assets.handcraft_pipelines.case1.rule"
     with open(os.path.join(pipeline_dir,"automat.json")) as reader:

@@ -1,6 +1,7 @@
 from colorama import Fore, Style
 import json
 
+from XAgent.utils import ToolCallStatusCode
 from XAgent.tools.param_system import ParamSystem
 from XAgent.tools.n8n_tools.n8n_compiler import n8n_compiler
 from XAgent.tools.n8n_tools.n8n_runner import run_node
@@ -51,6 +52,18 @@ class n8nParamSystem(ParamSystem):
 
 
     def run_tool(self):
-        print("\n".join(self.n8n_python_node.print_self()))
+        params_json = {}
+        for key, value in self.n8n_python_node.params.items():
+            param = value.to_json()
+            if param != None:
+                params_json[key] = param
+                
+        logger.typewriter_log(
+            "n8nTool: ",
+            Fore.CYAN,
+            f"COMMAND: {Fore.CYAN}{self.n8n_python_node.node_meta.integration_name}.{self.n8n_python_node.node_meta.resource_name}.{self.n8n_python_node.node_meta.operation_name}{Style.RESET_ALL}"
+            f"ARGUMENTS: \n{Fore.CYAN}{json.dumps(params_json)}{Style.RESET_ALL}",
+        )
 
-        run_node(self.n8n_python_node)
+        output_data,error = run_node(self.n8n_python_node)
+        return output_data, ToolCallStatusCode.TOOL_CALL_SUCCESS
