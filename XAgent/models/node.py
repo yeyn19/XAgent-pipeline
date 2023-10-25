@@ -1,9 +1,8 @@
 import os
 import abc
 from copy import deepcopy
-from enum import Enum
-from typing import List
 from dataclasses import dataclass
+from pydantic import BaseModel
 
 from XAgent.message_history import MessageHistory
 from XAgent.enums import ToolCallStatusCode, TaskStatusCode,ToolType
@@ -16,36 +15,31 @@ class Node(metaclass = abc.ABCMeta):
         
 
 
-class ToolNode(Node):
+class ToolNode(BaseModel):
     """存储所有工具相关信息的数据结构
     """
-    def __init__(self,data:dict = None,tool_type=ToolType.Default):
-        self.tool_type = tool_type
-        self.father: ToolNode = None
+    tool_type:ToolType = ToolType.Default
 
-        self.expand_num = 0
-        if data is not None:
-            self.data = data 
-        else:
-            self.data = {
-                "content": "",
-                "thoughts": {
-                    "properties": {
-                        "thought": "",
-                        "reasoning": "",
-                        "plan": "",
-                        "criticism": "",
-                    },
-                },
-                "command": {
-                    "properties": {
-                        "name": "",
-                        "args": "",
-                    },
-                },
-                "tool_output": "",
-                "tool_status_code": ToolCallStatusCode.TOOL_CALL_SUCCESS,
-            }
+    expand_num:int = 0
+    data:dict = {
+        "content": "",
+        "thoughts": {
+            "properties": {
+                "thought": "",
+                "reasoning": "",
+                "plan": "",
+                "criticism": "",
+            },
+        },
+        "command": {
+            "properties": {
+                "name": "",
+                "args": "",
+            },
+        },
+        "tool_output": "",
+        "tool_status_code": ToolCallStatusCode.TOOL_CALL_SUCCESS,
+    }
 
     @property
     def content(self):

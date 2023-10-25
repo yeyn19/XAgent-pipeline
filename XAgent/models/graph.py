@@ -61,6 +61,24 @@ class ExecutionGraph(BaseModel):
         
         return data
     
+    def get_execution_track(self,exclude_begin_node=True):
+        sequence = []
+        all_start_nodes = [node.node_id for node in self.nodes.values() if node.in_degree == 0]
+        all_visited_nodes = set()
+        for node in all_start_nodes:
+            def dfs(node:ExecutionNode)->Dict[Any,Any]:
+                if node.node_id in all_visited_nodes:
+                    return
+                all_visited_nodes.add(node.node_id)
+                sequence.append(node)
+                for next_node in self.get_adjacent_node(node):
+                    dfs(self.nodes[next_node])
+            dfs(self.nodes[node])
+        
+        if exclude_begin_node:
+            sequence = list(filter(lambda x:x.node_id not in all_start_nodes,sequence))
+        return sequence
+    
     def reduce_graph_to_sequence(self):
         # random walk to a leaf node
         eg = ExecutionGraph()

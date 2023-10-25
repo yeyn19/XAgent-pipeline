@@ -15,7 +15,7 @@ from XAgent.enums import ToolType,TaskStatusCode,RequiredAbilities,PlanOperation
 from XAgent.ai_functions import  function_manager
 from XAgent.running_recorder import recorder
 # from XAgent.tool_call_handle import toolserver_interface
-from XAgent.tools import reacttoolexecutor
+from XAgent.global_vars import reacttoolexecutor
 from XAgent.agent.summarize import summarize_plan,clip_text
 from XAgent.config import CONFIG
 def plan_function_output_parser(function_output_item: dict) -> Plan:

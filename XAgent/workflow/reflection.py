@@ -10,7 +10,7 @@ from XAgent.global_vars import agent_dispatcher
 from XAgent.agent.summarize import summarize_action,summarize_plan
 from XAgent.ai_functions import function_manager
 
-def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: ToolNode, tool_functions_description_list: List[dict], config):
+def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, actions: list[ToolNode], tool_functions_description_list: List[dict], config):
 
     agent = agent_dispatcher.dispatch(
         RequiredAbilities.reflection,
@@ -20,10 +20,10 @@ def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: To
     terminal_plan = terminal_plan.to_json()
     if config.enable_summary:
         terminal_plan = summarize_plan(terminal_plan)
-        action_process = summarize_action(finish_node.process, terminal_plan)
+        action_process = summarize_action(actions, terminal_plan)
         all_plan = summarize_plan(all_plan)
     else:
-        action_process = json.dumps(finish_node.process,indent=2,ensure_ascii=False)
+        action_process = json.dumps(actions,indent=2,ensure_ascii=False)
         all_plan = json.dumps(all_plan, indent=2, ensure_ascii=False)
         terminal_plan = json.dumps(terminal_plan, indent=2, ensure_ascii=False)
         

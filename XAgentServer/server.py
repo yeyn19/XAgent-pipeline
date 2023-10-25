@@ -34,23 +34,23 @@ class XAgentServer:
         config.reload()
         # args
         args = interaction.parameter.args
-        if interaction.base.recorder_root_dir:
-            if not os.path.exists(interaction.base.recorder_root_dir):
-                raise Exception(
-                    f"recorder_root_dir {interaction.base.recorder_root_dir} not exists")
-            recorder.load_from_disk(interaction.base.recorder_root_dir)
-            query = recorder.get_query()
-            self.logger.info(
-                f"server is running, the start recorder_root_dir is {interaction.base.recorder_root_dir}")
-        else:
-            query = AutoGPTQuery(
-                role_name=args.get('role_name', 'Assistant'),
-                task=args.get('goal', ''),
-                plan=args.get('plan', [
-                ]),
-            )
-       
-            self.logger.info(f"server is running, the start query is {args.get('goal', '')}")
+        # if interaction.base.recorder_root_dir:
+        #     if not os.path.exists(interaction.base.recorder_root_dir):
+        #         raise Exception(
+        #             f"recorder_root_dir {interaction.base.recorder_root_dir} not exists")
+        #     recorder.load_from_disk(interaction.base.recorder_root_dir)
+        #     query = recorder.get_query()
+        #     self.logger.info(
+        #         f"server is running, the start recorder_root_dir is {interaction.base.recorder_root_dir}")
+        # else:
+        query = AutoGPTQuery(
+            role_name=args.get('role_name', 'Assistant'),
+            task=args.get('goal', ''),
+            plan=args.get('plan', [
+            ]),
+        )
+    
+        self.logger.info(f"server is running, the start query is {args.get('goal', '')}")
         
         recorder.regist_query(query)
         recorder.regist_config(config)

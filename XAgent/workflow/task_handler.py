@@ -5,8 +5,7 @@ from typing import Dict, List
 from colorama import Fore
 
 from XAgent.global_vars import agent_dispatcher
-from XAgent.config import CONFIG
-from XAgent.inner_loop_search_algorithms.ReACT import ReACTChainSearch
+from XAgent.engines import ReActEngine
 from XAgent.logs import logger, print_task_save_items
 from XAgent.ai_functions import function_manager
 from XAgent.running_recorder import recorder
@@ -108,8 +107,7 @@ class TaskHandler():
                     self.now_dealing_task, receive_data)
             search_method = await self.inner_loop_async(self.now_dealing_task)
 
-            self.now_dealing_task.process_node = search_method.get_finish_node()
-
+            self.now_dealing_task.actions = list(map(lambda x:x.tool_node,search_method.get_execution_track())) 
             self.posterior_process(self.now_dealing_task)
 
             working_memory_agent.register_task(self.now_dealing_task)
@@ -170,12 +168,6 @@ class TaskHandler():
         )
         print_task_save_items(plan.data)
 
-        agent = agent_dispatcher.dispatch(
-            RequiredAbilities.tool_tree_search,
-            json.dumps(plan.data.to_json(), indent=2, ensure_ascii=False),
-            # avaliable_tools_description_list=self.avaliable_tools_description_list
-        )
-
         plan.data.status = TaskStatusCode.DOING
 
         if self.config.rapidapi_retrieve_tool_count > 0:  
@@ -184,24 +176,26 @@ class TaskHandler():
             # TODO: fix latter, adding rapid api to the interface with right format
             
 
-        search_method = ReACTChainSearch()
+        react_engine = ReActEngine(config=self.config)
         
         arguments = function_manager.get_function_schema('action_reasoning')['parameters']
-        await search_method.run_async(config=self.config,
-                                      agent=agent,
-                                      task_handler=self,
-                                      arguments=arguments,
-                                      functions=reacttoolexecutor.get_available_tools()[1],
-                                      task_id=task_ids_str)
+        exec_result = await react_engine.run(
+            task=plan.to_json(),
+            plans=self.plan_agent.latest_plan.to_json(),
+            toolexecutor=reacttoolexecutor,
+            arguments=arguments,
+            functions=reacttoolexecutor.get_available_tools()[1],
+            task_id=task_ids_str,
+            interaction=self.interaction,)
 
-        if search_method.status == SearchMethodStatusCode.SUCCESS:
+        if exec_result.status == SearchMethodStatusCode.SUCCESS:
             plan.data.status = TaskStatusCode.SUCCESS
             logger.typewriter_log(
                 f"-=-=-=-=-=-=-= Task {task_ids_str} ({plan.data.name}): Solved -=-=-=-=-=-=-=",
                 Fore.GREEN,
                 "",
             )
-        elif search_method.status == SearchMethodStatusCode.FAIL:
+        elif exec_result.status == SearchMethodStatusCode.FAIL:
             plan.data.status = TaskStatusCode.FAIL
             logger.typewriter_log(
                 f"-=-=-=-=-=-=-= Task {task_ids_str} ({plan.data.name}): Failed -=-=-=-=-=-=-=",
@@ -210,7 +204,7 @@ class TaskHandler():
             )
         else:
             assert False, f"{plan.data.name}"
-        return search_method
+        return exec_result
 
     def posterior_process(self, terminal_plan: Plan):
 
@@ -221,7 +215,7 @@ class TaskHandler():
         posterior_data = get_posterior_knowledge(
             all_plan=self.plan_agent.latest_plan,
             terminal_plan=terminal_plan,
-            finish_node=terminal_plan.process_node,
+            actions=terminal_plan.actions,
             tool_functions_description_list=self.tool_functions_description_list,
             config=self.config,
         )
