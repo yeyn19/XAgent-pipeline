@@ -1,5 +1,6 @@
 from colorama import Fore
-from XAgent.utils import ToolCallStatusCode,get_token_nums,clip_text
+from XAgent.enums import ToolCallStatusCode
+from XAgent.utils import get_token_nums,clip_text
 from XAgent.ai_functions import function_manager
 from XAgent.config import CONFIG
 from XAgent.logs import logger

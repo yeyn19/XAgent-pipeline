@@ -1,6 +1,6 @@
 from typing import List
 from XAgent.agent.base_agent import BaseAgent
-from XAgent.utils import RequiredAbilities
+from XAgent.enums import RequiredAbilities
 from XAgent.ai_functions import function_manager, objgenerator
 from XAgent.message_history import Message
 

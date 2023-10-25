@@ -1,6 +1,6 @@
 from typing import List
 from XAgent.agent.plan_generate_agent import PlanGenerateAgent
-from XAgent.utils import RequiredAbilities
+from XAgent.enums import RequiredAbilities
 from XAgent.message_history import Message
 
 class PlanRefineAgent(PlanGenerateAgent):

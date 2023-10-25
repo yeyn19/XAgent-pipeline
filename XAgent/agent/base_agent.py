@@ -5,7 +5,7 @@ from colorama import Fore
 from copy import deepcopy
 
 from XAgent.config import CONFIG
-from XAgent.utils import LLMStatusCode, RequiredAbilities
+from XAgent.enums import LLMStatusCode, RequiredAbilities
 from XAgent.message_history import Message
 from XAgent.logs import logger
 from XAgent.ai_functions import objgenerator
