@@ -9,9 +9,9 @@ from XAgent.data_structure.node import ToolNode,ToolType
 from XAgent.data_structure.tree import TaskSearchTree
 from XAgent.logs import logger, print_assistant_thoughts
 from XAgent.message_history import Message
-from XAgent.tools import reacttoolexecutor
+from XAgent.global_vars import reacttoolexecutor
 # from XAgent.tool_call_handle import function_handler, toolserver_interface
-from XAgent.utils import SearchMethodStatusCode, ToolCallStatusCode
+from XAgent.enums import SearchMethodStatusCode, ToolCallStatusCode
 from XAgent.data_structure.plan import Plan
 
 

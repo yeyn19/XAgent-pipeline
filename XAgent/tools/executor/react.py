@@ -1,7 +1,5 @@
-from typing import Any
 from XAgent.config import CONFIG
-from XAgent.data_structure import ToolNode
-from XAgent.utils import ToolType
+from XAgent.enums import ToolType
 
 from .base import BaseToolExecutor
 from ..interfaces import BuiltInInterface, ToolServerInterface

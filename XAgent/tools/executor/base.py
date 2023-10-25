@@ -5,7 +5,7 @@ from XAgent.logs import logger
 from XAgent.config import CONFIG
 from XAgent.data_structure import ToolNode
 from XAgent.tools.interfaces import BaseToolInterface
-from XAgent.utils import ToolCallStatusCode,ToolType
+from XAgent.enums import ToolCallStatusCode,ToolType
 
 class BaseToolExecutor:
     """The ToolExecutor is responsible to execute the tools and manage the tool interfaces."""

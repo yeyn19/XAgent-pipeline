@@ -4,7 +4,7 @@ from colorama import Fore
 
 from XAgent.logs import logger
 from XAgent.ai_functions import function_manager
-from XAgent.utils import ToolCallStatusCode
+from XAgent.enums import ToolCallStatusCode
 from .base import BaseToolInterface
 
 

@@ -23,11 +23,11 @@ class XAgentServer:
         from XAgent.agent import (PlanGenerateAgent, PlanRefineAgent,
                                   ReflectAgent, ToolAgent)
         from XAgent.config import CONFIG as config
-        from XAgent.global_vars import agent_dispatcher, config,reacttoolexecutor
+        from XAgent.global_vars import agent_dispatcher,reacttoolexecutor
         from XAgent.running_recorder import recorder
         # from XAgent.tool_call_handle import (function_handler,
         #                                      toolserver_interface)
-        from XAgent.utils import ToolType
+        from XAgent.enums import ToolType
         from XAgent.workflow.base_query import AutoGPTQuery
         from XAgent.workflow.task_handler import TaskHandler
         from XAgent.workflow.working_memory import WorkingMemoryAgent

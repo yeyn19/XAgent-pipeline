@@ -2,10 +2,10 @@
 from XAgent.agent.dispatcher import agent_dispatcher
 #from XAgent.vector_db import VectorDBInterface
 # from XAgent.running_recorder import RunningRecoder
-from XAgent.config import CONFIG as config
+from XAgent.config import CONFIG as __config
 from XAgent.tools import ReActToolExecutor
 
-reacttoolexecutor = ReActToolExecutor(config)
+reacttoolexecutor = ReActToolExecutor(__config)
 
 # working_memory_agent = WorkingMemoryAgent()
 # vector_db_interface = VectorDBInterface()

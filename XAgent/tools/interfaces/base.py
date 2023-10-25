@@ -1,6 +1,6 @@
 from typing import Any,Union,Tuple
 from XAgent.ai_functions import function_manager
-from XAgent.utils import ToolCallStatusCode
+from XAgent.enums import ToolCallStatusCode
 
 
 class BaseToolInterface:
