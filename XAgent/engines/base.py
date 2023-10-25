@@ -2,7 +2,6 @@ from typing import Any,Tuple
 
 from XAgent.config import CONFIG
 from XAgent.models import ExecutionNode,ExecutionGraph
-from XAgent.global_vars import INTERRUPT
 
 
 class BaseEngine:
@@ -22,27 +21,7 @@ class BaseEngine:
     
     async def run(self,task,*args,**kwargs)->ExecutionGraph:
         """Execute the engine and return the result node."""
-        execution_trace = ExecutionGraph()
-        begin_node = ExecutionNode(begin_node=True)
-        execution_trace.set_begin_node(begin_node)
-        
-        
-        node = begin_node
-        while node.end_node != False:
-            nnode = await self.step(
-                task=task,
-                force_stop = execution_trace.node_count >= self.config.max_subtask_chain_length,
-                interrupt = INTERRUPT,
-                *args,**kwargs)
-            
-            execution_trace.add_node(nnode)
-            execution_trace.add_edge(node,nnode)
-            node = nnode
-            
-            
-        execution_trace.set_end_node(node)
-        
-        return execution_trace
+        raise NotImplementedError
         
         
         

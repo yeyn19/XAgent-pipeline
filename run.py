@@ -49,6 +49,10 @@ if __name__ == '__main__':
         json_data=pipeline_json_data,
         rule_file_name=file,
     )
+    
+    import asyncio
+    asyncio.run(run_pipeline(pipeline))
+    
     run_pipeline(pipeline)
     exit()
     args = parse_args()
