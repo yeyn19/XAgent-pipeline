@@ -16,7 +16,7 @@ Currently, ToolServer provides the following tools:
 You can also easily add new tools to ToolServer to enhance agent's abilities.
 
 ## ⚡️ Configurations
-Configurations for ToolServer are stored in `ToolServer/config/`. You can change them and rebuild images to apply the changes.
+Configurations for ToolServer are stored in `assets/config/`. You can change them and rebuild images to apply the changes.
 Notes:
 - Change `node.privileged` to `false` in `manager.yml` if you don't want to used docker in ToolServerNode. This will disable the ability to run docker commands in ToolServerNode.
 - Change `idling_close_minutes` in `monitor.yml` to change the time that ToolServerMonitor will wait before closing idle ToolServerNode instances.
@@ -24,17 +24,15 @@ Notes:
 - Change api timeout for Toolserver in `docker-compose.yml` by altering values after `-t` in `services.ToolServerManager.command` if you encounter timeout error of ToolServer.
 
 ## 🛠️ Build and Setup ToolServer
-All docker image build files are stored in `ToolServer/dockerfiles`.
+All docker image build files are stored in `dockerfiles/`.
 You can build them manually with following command:
 ```bash
-cd ToolServer
 docker-compose build
 ```
-This will build all the docker images for ToolServerManager, ToolServerMonitor and ToolServerNode.
+This will build all the docker images for ToolServerManager, ToolServerMonitor and ToolServerNode. Note that the configuration files wiil be copyed to the docker images during the building process due to stability issues. If you change the configuration files, you should rebuild the docker images to apply the changes.
 
 After building the docker images, you can start the docker container with following command:
 ```bash
-cd ToolServer
 docker-compose up
 ```
 Note that you should install `docker` and `docker-compose` first.

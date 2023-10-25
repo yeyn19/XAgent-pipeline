@@ -30,5 +30,7 @@ local_workspace/**
 sync.py
 assets/private.yml
 assets/garbage
+**.log
+log/**
 
 XAgentWeb/src/api/backend.ts

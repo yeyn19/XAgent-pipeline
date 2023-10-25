@@ -1,6 +1,7 @@
 import os
-from copy import deepcopy
 import abc
+from copy import deepcopy
+from enum import Enum
 from typing import List
 from dataclasses import dataclass
 
@@ -13,29 +14,87 @@ class Node(metaclass = abc.ABCMeta):
     def __init__(self):
         pass
 
-@dataclass
-class ToolNode(Node):
-    def __init__(self):
+class ToolType(Enum):
+    Default = 'Default'
+    BuiltIn = 'BuildIn'
+    ToolServer = 'ToolServer'
+    Rapid = 'Rapid'
+    N8N = 'N8N'
+    Custom = 'Custom'
+    def __hash__(self):
+        return hash(self.value)
+        
 
-        self.data = {
-            "content": "",
-            "thoughts": {
-                "properties": {
-                    "thought": "",
-                    "reasoning": "",
-                    "plan": "",
-                    "criticism": "",
+class ToolNode(Node):
+    def __init__(self,data:dict = None,tool_type=ToolType.Default):
+        self.tool_type = tool_type
+        self.father: ToolNode = None
+        self.children: list[ToolNode] = []
+
+        self.expand_num = 0
+        if data is not None:
+            self.data = data 
+        else:
+            self.data = {
+                "content": "",
+                "thoughts": {
+                    "properties": {
+                        "thought": "",
+                        "reasoning": "",
+                        "plan": "",
+                        "criticism": "",
+                    },
                 },
-            },
-            "command": {
-                "properties": {
-                    "name": "",
-                    "args": "",
+                "command": {
+                    "properties": {
+                        "name": "",
+                        "args": "",
+                    },
                 },
-            },
-            "tool_output": "",
-            "tool_status_code": ToolCallStatusCode.TOOL_CALL_SUCCESS,
-        }
+                "tool_output": "",
+                "tool_status_code": ToolCallStatusCode.TOOL_CALL_SUCCESS,
+            }
+        self.history: MessageHistory = MessageHistory()
+
+    @property
+    def content(self):
+        return self.data["content"]
+    
+    @property
+    def thought(self):
+        if self.data["thoughts"]["properties"].get('thought','') == "":
+            return None
+        return self.data["thoughts"]["properties"]["thought"]
+    
+    @property
+    def reasoning(self):
+        if self.data["thoughts"]["properties"].get('reasoning','') == "":
+            return None
+        return self.data["thoughts"]["properties"]["reasoning"]
+    
+    @property
+    def plan(self):
+        if self.data["thoughts"]["properties"].get('plan','')== "":
+            return None
+        return self.data["thoughts"]["properties"]["plan"]
+    
+    @property
+    def criticism(self):
+        if self.data["thoughts"]["properties"].get("criticism",'') == "":
+            return None
+        return self.data["thoughts"]["properties"]["criticism"]
+    
+    @property
+    def tool_name(self):
+        if self.data["command"]["properties"]["name"] == "":
+            return None
+        return self.data["command"]["properties"]["name"]
+    @property
+    def tool_args(self):
+        if self.data["command"]["properties"]["args"] == "":
+            return None
+        return self.data["command"]["properties"]["args"]
+
 
 
     def to_json(self):

@@ -93,17 +93,6 @@ python run.py --task "put your task here" --model "gpt-4"
 # 在ToolServer docker 时已经开启web ui docker了
 # 只需新开一个命令行，开启docker中的 nginx
 docker exec XAgent-Server systemctl start nginx
-
-# 当然，您也可以通过下面的命令启动后端服务
-# python3.10+ is required
-cd XAgentServer
-pip install -r requirements.txt
-cd ..
-python start_server.py
-# 启动前端服务:
-cd ../XAgentWeb
-npm install
-npm run dev
 ```
 构建XAgent-Server的docker镜像并启动docker容器。
 您将看到XAgent Server在端口`8090`上监听。
@@ -153,6 +142,10 @@ XAgent 不仅能处理琐碎任务，还可以在复杂任务中提供宝贵的�
 
 # 🖌️ 博客
 我们的官方博客在[这里](https://blog.x-agent.net/)！
+
+# 🌟 星标历史
+
+[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/#openbmb/xagent&Date)
 
 # 引用
 如果您发现我们的仓库对您有帮助，请引用我们的论文：

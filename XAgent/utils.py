@@ -60,7 +60,16 @@ class ToolCallStatusCode(Enum):
     SUBMIT_AS_FAILED = 8
     def __str__(self):
         return self.__class__.__name__ + ": " + self.name
-
+    def color(self):
+        match self.name:
+            case "TOOL_CALL_SUCCESS":
+                return Fore.GREEN
+            case "SUBMIT_AS_SUCCESS":
+                return Fore.GREEN
+            case "SUBMIT_AS_FAILED":
+                return Fore.BLUE
+            case _:
+                return Fore.RED
 @unique
 class PlanOperationStatusCode(Enum):
     MODIFY_SUCCESS = 0
