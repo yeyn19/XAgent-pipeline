@@ -1,9 +1,9 @@
 from typing import List, Dict
 from enum import Enum, unique
 
-from XAgent.utils import RequiredAbilities
+from XAgent.enums import RequiredAbilities
 from XAgent.global_vars import agent_dispatcher
-from XAgent.data_structure.node import Node
+from XAgent.models.node import Node
 from XAgent.message_history import Message
 
 class SummarizationNode(Node):

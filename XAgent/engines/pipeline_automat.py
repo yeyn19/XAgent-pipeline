@@ -3,7 +3,7 @@
 
 from typing import Any
 from XAgent.config import CONFIG
-from XAgent.data_structure import ToolNode
+from XAgent.models import ToolNode
 
 from .base import BaseEngine
 

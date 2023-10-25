@@ -4,9 +4,10 @@ from colorama import Fore, Style
 from enum import Enum, unique, auto
 
 
-from XAgent.data_structure.pipeline_automat import PipelineAutoMat, PipelineAutoMatNode, RouteResult, RuntimeStackUserInterface, RuntimeTool, RuntimeNode
+from XAgent.models.pipeline_automat import PipelineAutoMat, PipelineAutoMatNode, RouteResult, RuntimeStackUserInterface, RuntimeTool, RuntimeNode
 from XAgent.logs import logger
-from XAgent.utils import has_route_function, AutoMatEdgeType
+from XAgent.utils import has_route_function
+from XAgent.enums import AutoMatEdgeType
 from XAgent.engines.param_system import ParamSystem
 
                 

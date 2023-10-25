@@ -4,17 +4,17 @@ from typing import Dict, List
 
 from colorama import Fore
 
-from XAgent.global_vars import agent_dispatcher,config
+from XAgent.global_vars import agent_dispatcher
+from XAgent.config import CONFIG
 from XAgent.inner_loop_search_algorithms.ReACT import ReACTChainSearch
 from XAgent.logs import logger, print_task_save_items
 from XAgent.ai_functions import function_manager
 from XAgent.running_recorder import recorder
-from XAgent.tools import reacttoolexecutor
-from XAgent.data_structure import ToolType
+from XAgent.global_vars import reacttoolexecutor
 # from XAgent.tool_call_handle import function_handler, toolserver_interface
 from XAgent.agent.summarize import summarize_plan 
-from XAgent.utils import (RequiredAbilities, SearchMethodStatusCode,
-                          TaskSaveItem, TaskStatusCode)
+from XAgent.enums import ToolType,RequiredAbilities, SearchMethodStatusCode,TaskStatusCode
+from XAgent.utils import TaskSaveItem
 from .base_query import BaseQuery
 from .plan_exec import Plan, PlanAgent
 from .reflection import get_posterior_knowledge

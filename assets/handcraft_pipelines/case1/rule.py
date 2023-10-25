@@ -1,4 +1,4 @@
-from XAgent.data_structure.pipeline_automat import PipelineAutoMatEdge, RouteResult, RuntimeStackUserInterface
+from XAgent.models.pipeline_automat import PipelineAutoMatEdge, RouteResult, RuntimeStackUserInterface
 
 
 def route_edge_1(edge_info: PipelineAutoMatEdge,pipeline_param: dict, runtime_stack: RuntimeStackUserInterface) -> RouteResult:

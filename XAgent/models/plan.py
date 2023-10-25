@@ -1,6 +1,6 @@
 from typing import List, Optional
 from XAgent.utils import TaskSaveItem, TaskStatusCode
-from XAgent.data_structure.node import ToolNode
+from XAgent.models import ToolNode
 
 class Plan:
     def __init__(self, data: TaskSaveItem):

@@ -3,7 +3,7 @@ from typing import Any,Union,Tuple
 
 from XAgent.logs import logger
 from XAgent.config import CONFIG
-from XAgent.data_structure import ToolNode
+from XAgent.models import ToolNode
 from XAgent.tools.interfaces import BaseToolInterface
 from XAgent.enums import ToolCallStatusCode,ToolType
 

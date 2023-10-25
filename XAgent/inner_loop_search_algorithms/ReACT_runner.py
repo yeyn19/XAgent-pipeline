@@ -5,14 +5,11 @@ from colorama import Fore
 from XAgent.config import CONFIG
 from XAgent.agent.base_agent import BaseAgent
 from XAgent.agent.summarize import summarize_action,summarize_plan,clip_text,get_token_nums
-from XAgent.data_structure.node import ToolNode,ToolType
-from XAgent.data_structure.tree import TaskSearchTree
+from XAgent.models import ToolNode,TaskSearchTree
+from XAgent.enums import ToolType, SearchMethodStatusCode, ToolCallStatusCode
 from XAgent.logs import logger, print_assistant_thoughts
 from XAgent.message_history import Message
 from XAgent.global_vars import reacttoolexecutor
-# from XAgent.tool_call_handle import function_handler, toolserver_interface
-from XAgent.enums import SearchMethodStatusCode, ToolCallStatusCode
-from XAgent.data_structure.plan import Plan
 
 
 def make_message(now_node: ToolNode, task_handler, max_length, config):

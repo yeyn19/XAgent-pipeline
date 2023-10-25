@@ -1,4 +1,4 @@
-from XAgent.data_structure.node import ToolNode
+from XAgent.models import ToolNode
 
 
 class TaskSearchTree:

@@ -8,9 +8,10 @@ from copy import deepcopy
 from XAgent.logs import logger
 from XAgent.workflow.base_query import BaseQuery
 from XAgent.global_vars import agent_dispatcher
-from XAgent.utils import TaskSaveItem, RequiredAbilities, PlanOperationStatusCode, TaskStatusCode
+from XAgent.utils import TaskSaveItem
 from XAgent.message_history import Message
-from XAgent.data_structure import Plan,ToolNode,ToolType
+from XAgent.models import Plan,ToolNode
+from XAgent.enums import ToolType,TaskStatusCode,RequiredAbilities,PlanOperationStatusCode
 from XAgent.ai_functions import  function_manager
 from XAgent.running_recorder import recorder
 # from XAgent.tool_call_handle import toolserver_interface

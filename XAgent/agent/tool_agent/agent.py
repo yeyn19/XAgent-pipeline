@@ -6,10 +6,10 @@ from colorama import Fore
 from tenacity import retry, stop_after_attempt
 
 from XAgent.agent.base_agent import BaseAgent
-from XAgent.utils import RequiredAbilities
+from XAgent.enums import RequiredAbilities
 from XAgent.message_history import Message
 from XAgent.logs import logger
-from XAgent.data_structure.node import ToolNode
+from XAgent.models import ToolNode
 from XAgent.ai_functions import function_manager,objgenerator
 from XAgent.config import CONFIG
 

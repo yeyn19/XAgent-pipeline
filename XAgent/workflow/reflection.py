@@ -3,8 +3,8 @@ import json5
 from typing import List
 from copy import deepcopy
 
-from XAgent.utils import RequiredAbilities
-from XAgent.data_structure.node import ToolNode
+from XAgent.enums import RequiredAbilities
+from XAgent.models import ToolNode
 from XAgent.workflow.plan_exec import Plan
 from XAgent.global_vars import agent_dispatcher
 from XAgent.agent.summarize import summarize_action,summarize_plan

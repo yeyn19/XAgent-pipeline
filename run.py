@@ -4,8 +4,8 @@ import argparse
 import json
 
 from XAgent.inner_loop_search_algorithms.pipeline_runner import run_pipeline
-from XAgent.data_structure.pipeline_automat import PipelineAutoMat
-from XAgent.tools import reacttoolexecutor
+from XAgent.models.pipeline_automat import PipelineAutoMat
+from XAgent.global_vars import reacttoolexecutor
 from copy import deepcopy
 from XAgent.config import CONFIG,ARGS
 from command import CommandLine,XAgentServerEnv
