@@ -30,13 +30,11 @@ class BaseToolExecutor:
         tools_json = []
         tool_type_mapping = {}
         for tool_type,interface in self.interfaces.items():
-            ret = interface.get_available_tools()
-            available_tools.extend(ret[0])
-            tools_json.extend(ret[1])
-
-            for tool in available_tools:
+            new_tools,new_tools_json = interface.get_available_tools()
+            for tool in new_tools:
                 tool_type_mapping[tool] = tool_type
-        
+            available_tools.extend(new_tools)
+            tools_json.extend(new_tools_json)
         self.tool_type_mapping = tool_type_mapping
         return available_tools,tools_json
     
@@ -57,6 +55,6 @@ class BaseToolExecutor:
         
         logger.typewriter_log("Tool Return: ", Fore.YELLOW, str(output))
         logger.typewriter_log(
-            "TOOL STATUS CODE: ", Fore.YELLOW, f"{status_code.color()}{status_code}{Style.RESET_ALL}"
+            "TOOL STATUS CODE: ", Fore.YELLOW, f"{status_code.color()}{status_code.name}{Style.RESET_ALL}"
         )
         return status_code,output
