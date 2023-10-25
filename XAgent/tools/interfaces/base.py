@@ -4,6 +4,11 @@ from XAgent.utils import ToolCallStatusCode
 
 
 class BaseToolInterface:
+    """
+    ToolInterface is used to interact with the tools, including retrieving the 
+    tools, executing the tools and getting the schema of the tools.
+    Interface is the bridge between the XAgent and tool services.
+    """
     def __init__(self,*args,**kwargs) -> None:
         pass
         

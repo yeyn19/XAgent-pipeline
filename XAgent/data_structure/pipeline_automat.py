@@ -9,7 +9,7 @@ import uuid
 import types
 
 from XAgent.utils import AutoMatEdgeType, AutoMatStateChangeHardness,ExecutionType, ToolCallStatusCode
-from XAgent.tools.param_system import ParamSystem
+from XAgent.engines.param_system import ParamSystem
 from XAgent.logs import logger
 
 
@@ -115,7 +115,7 @@ class PipelineAutoMat():
         automat.meta = PipelineMeta.from_json(json_data["meta"])
         for node in json_data["nodes"]:
             new_node = PipelineAutoMatNode.from_json(node)
-            from XAgent.tools.param_system_interface import get_param_system
+            from XAgent.engines.param_system_interface import get_param_system
             new_node.param_interface = get_param_system(new_node.tool_name, new_node.node_type)
 
             function_name = f"route_node_{new_node.node_name}"

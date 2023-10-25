@@ -3,7 +3,7 @@ from typing import List, Dict
 from copy import deepcopy
 
 from XAgent.logs import logger
-from XAgent.tools.param_system import ParamSystem
+from XAgent.engines.param_system import ParamSystem
 from XAgent.tools.n8n_tools.n8n_utils import NodeType, n8nNodeMeta
 from XAgent.tools.n8n_tools.n8n_node import n8nPythonNode
 from XAgent.tools.n8n_tools.n8n_param_parser import parse_properties

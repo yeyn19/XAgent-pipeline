@@ -3,13 +3,12 @@ from typing import Any,Union,Tuple
 
 from XAgent.logs import logger
 from XAgent.config import CONFIG
-from XAgent.data_structure import ToolNode,ToolType
-from XAgent.tools.interface import BaseToolInterface
-from XAgent.utils import ToolCallStatusCode
+from XAgent.data_structure import ToolNode
+from XAgent.tools.interfaces import BaseToolInterface
+from XAgent.utils import ToolCallStatusCode,ToolType
 
 class BaseToolExecutor:
-    """原子Tool调用可以用默认的executor
-    """
+    """The ToolExecutor is responsible to execute the tools and manage the tool interfaces."""
     def __init__(self,config=CONFIG) -> None:
         self.config = config
         self.interfaces:dict[ToolType,BaseToolInterface] = {}
@@ -28,8 +27,6 @@ class BaseToolExecutor:
             interface.close()
     
     def get_available_tools(self)->Tuple[list[str],dict]:
-        """flatten所有interface和对应的tool
-        """
         available_tools = []
         tools_json = []
         tool_type_mapping = {}
@@ -43,8 +40,6 @@ class BaseToolExecutor:
         return available_tools,tools_json
     
     def execute(self,tool_node:ToolNode)->Tuple[ToolCallStatusCode,Any]:
-        """执行一个toolNode，返回对应的执行状态码和data
-        """
         logger.typewriter_log(
             "NEXT ACTION: ",
             Fore.CYAN,
