@@ -54,7 +54,7 @@ def run_pipeline(pipeline: PipelineAutoMat):
         logger.typewriter_log(
             f"pipeline newly select node \"{next_node.node_name}\"",
             Fore.YELLOW,
-            f"{next_node.tool_type}: {next_node.tool_name}"
+            f"{next_node.node_type}: {next_node.tool_name}"
         )
 
         next_node.param_interface.partly_implement(given_param_dict=route_result.params)

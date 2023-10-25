@@ -38,6 +38,7 @@ if __name__ == '__main__':
     # args = parse_args()
     CONFIG.reload("./assets/private.yml")
     reacttoolexecutor.lazy_init(CONFIG)
+    reacttoolexecutor.get_available_tools()
 
 
     pipeline_dir = "./assets/handcraft_pipelines/case1"

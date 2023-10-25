@@ -95,7 +95,9 @@ class ToolNode(Node):
             return None
         return self.data["command"]["properties"]["args"]
 
-
+    def set_tool(self,tool_name,tool_args):
+        self.data["command"]["properties"]["name"] = tool_name
+        self.data["command"]["properties"]["args"] = tool_args
 
     def to_json(self):
         data = deepcopy(self.data)

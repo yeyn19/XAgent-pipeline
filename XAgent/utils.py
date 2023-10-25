@@ -41,6 +41,7 @@ class ExecutionNodeType(Enum):
     Pipeline = "Pipeline"
     Custom = "Custom"
     Controlflow = "Control"
+    N8N = "N8N" # should remove in future
 
 
 @unique

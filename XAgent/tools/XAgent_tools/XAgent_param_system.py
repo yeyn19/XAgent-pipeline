@@ -38,8 +38,7 @@ class XAgentParamSystem(ParamSystem):
             f"ARGUMENTS: \n{Fore.CYAN}{json.dumps(self.params)}{Style.RESET_ALL}",
         )
         tool_node = ToolNode()
-        tool_node.tool_name = self.tool_name
-        tool_node.tool_args = self.params
+        tool_node.set_tool(self.tool_name,self.params)
         status_code,tool_output = reacttoolexecutor.execute(tool_node)
 
         return tool_output, status_code

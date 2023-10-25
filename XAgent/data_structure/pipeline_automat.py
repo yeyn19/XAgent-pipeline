@@ -162,7 +162,7 @@ class PipelineAutoMat():
         for node in json_data["nodes"]:
             new_node = PipelineAutoMatNode.from_json(node)
             from XAgent.tools.param_system_interface import get_param_system
-            new_node.param_interface = get_param_system(new_node.tool_name, new_node.tool_type)
+            new_node.param_interface = get_param_system(new_node.tool_name, new_node.node_type)
 
             function_name = f"route_node_{new_node.node_name}"
             module = importlib.import_module(rule_file_name)

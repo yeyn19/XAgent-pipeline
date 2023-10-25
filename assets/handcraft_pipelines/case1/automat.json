@@ -30,7 +30,7 @@
         },
         {
             "node_name": "print_file_system",
-            "tool_name": "FileSystemEnv_print_filesys_struture",
+            "tool_name": "FileSystemEnv_read_from_file",
             "node_type": "ReACT"
         }
     ],
