@@ -15,6 +15,7 @@ class Node(metaclass = abc.ABCMeta):
         pass
         
 
+
 class ToolNode(Node):
     """存储所有工具相关信息的数据结构
     """
@@ -97,3 +98,6 @@ class ToolNode(Node):
 
 
 
+class ExecutionNode(ToolNode):
+    """Node for storing the execution information of the task"""
+    pass

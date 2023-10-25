@@ -6,7 +6,7 @@ from XAgent.config import CONFIG as __config
 from XAgent.tools import ReActToolExecutor
 
 reacttoolexecutor = ReActToolExecutor(__config)
-
+INTERRUPT = False
 # working_memory_agent = WorkingMemoryAgent()
 # vector_db_interface = VectorDBInterface()
 # recorder = RunningRecoder()
