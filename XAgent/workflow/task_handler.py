@@ -9,7 +9,9 @@ from XAgent.inner_loop_search_algorithms.ReACT import ReACTChainSearch
 from XAgent.logs import logger, print_task_save_items
 from XAgent.ai_functions import function_manager
 from XAgent.running_recorder import recorder
-from XAgent.tool_call_handle import function_handler, toolserver_interface
+from XAgent.tools import reacttoolexecutor
+from XAgent.data_structure import ToolType
+# from XAgent.tool_call_handle import function_handler, toolserver_interface
 from XAgent.agent.summarize import summarize_plan 
 from XAgent.utils import (RequiredAbilities, SearchMethodStatusCode,
                           TaskSaveItem, TaskStatusCode)
@@ -178,14 +180,9 @@ class TaskHandler():
 
         if self.config.rapidapi_retrieve_tool_count > 0:  
             retrieve_string = summarize_plan(plan.to_json())
-            rapidapi_tool_names, rapidapi_tool_jsons = toolserver_interface.retrieve_rapidapi_tools(
-                retrieve_string, top_k=self.config.rapidapi_retrieve_tool_count)
-            if rapidapi_tool_names is not None:
-                function_handler.change_subtask_handle_function_enum(
-                    function_handler.tool_names + rapidapi_tool_names)
-                function_handler.avaliable_tools_description_list += rapidapi_tool_jsons
-            else:
-                print("bug: no rapidapi tool retrieved, need to fix here")
+            tools_des = reacttoolexecutor.get_interface_for_type(ToolType.Rapid).retrieve_tools(retrieve_string, top_k=self.config.rapidapi_retrieve_tool_count)
+            # TODO: fix latter, adding rapid api to the interface with right format
+            
 
         search_method = ReACTChainSearch()
         
@@ -194,8 +191,7 @@ class TaskHandler():
                                       agent=agent,
                                       task_handler=self,
                                       arguments=arguments,
-                                      functions=function_handler.intrinsic_tools(
-                                          self.config.enable_ask_human_for_help),
+                                      functions=reacttoolexecutor.get_available_tools()[1],
                                       task_id=task_ids_str)
 
         if search_method.status == SearchMethodStatusCode.SUCCESS:

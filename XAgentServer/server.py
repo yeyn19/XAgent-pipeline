@@ -25,8 +25,10 @@ class XAgentServer:
         from XAgent.config import CONFIG as config
         from XAgent.global_vars import agent_dispatcher, config
         from XAgent.running_recorder import recorder
-        from XAgent.tool_call_handle import (function_handler,
-                                             toolserver_interface)
+        # from XAgent.tool_call_handle import (function_handler,
+        #                                      toolserver_interface)
+        from XAgent.tools import reacttoolexecutor
+        from XAgent.data_structure import ToolType
         from XAgent.workflow.base_query import AutoGPTQuery
         from XAgent.workflow.task_handler import TaskHandler
         from XAgent.workflow.working_memory import WorkingMemoryAgent
@@ -60,13 +62,12 @@ class XAgentServer:
             Fore.RED,
             str(config.enable_ask_human_for_help),
         )
-
-        toolserver_interface.lazy_init(config=config)
+        reacttoolexecutor.lazy_init(config)
 
         # working memory function is used for communication between different agents that handle different subtasks
         working_memory_function = WorkingMemoryAgent.get_working_memory_function()
-        subtask_functions, tool_functions_description_list = function_handler.get_functions(
-            config)
+        
+        subtask_functions, tool_functions_description_list = reacttoolexecutor.get_available_tools()
 
         all_functions = subtask_functions + working_memory_function
 
@@ -84,7 +85,7 @@ class XAgentServer:
             upload_files = [os.path.join(XAgentServerEnv.Upload.upload_dir, interaction.base.user_id, file) for file in upload_files]
             for file_path in upload_files:
                 try:
-                    toolserver_interface.upload_file(file_path)
+                    reacttoolexecutor.get_interface_for_type(ToolType.ToolServer).upload_file(file_path)
                 except Exception as e:
                     self.logger.typewriter_log(
                         "Error happens when uploading file",
@@ -106,5 +107,5 @@ class XAgentServer:
             self.logger.info(traceback.format_exc())
             raise e
         finally:
-            toolserver_interface.download_all_files()
-            toolserver_interface.close()
+            reacttoolexecutor.get_interface_for_type(ToolType.ToolServer).download_all_files()
+            reacttoolexecutor.close()

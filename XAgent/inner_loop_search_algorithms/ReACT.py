@@ -5,14 +5,14 @@ from colorama import Fore
 from XAgent.config import CONFIG
 from XAgent.agent.base_agent import BaseAgent
 from XAgent.agent.summarize import summarize_action,summarize_plan,clip_text,get_token_nums
-from XAgent.data_structure.node import ToolNode
+from XAgent.data_structure.node import ToolNode,ToolType
 from XAgent.data_structure.tree import TaskSearchTree
 from XAgent.inner_loop_search_algorithms.base_search import BaseSearchMethod
 from XAgent.logs import logger, print_assistant_thoughts
 from XAgent.message_history import Message
-from XAgent.tool_call_handle import function_handler, toolserver_interface
+from XAgent.tools import reacttoolexecutor
+# from XAgent.tool_call_handle import function_handler, toolserver_interface
 from XAgent.utils import SearchMethodStatusCode, ToolCallStatusCode
-from XAgent.data_structure.plan import Plan
 from XAgent.ai_functions import function_manager
 NOW_SUBTASK_PROMPT = '''
 
@@ -159,8 +159,7 @@ class ReACTChainSearch(BaseSearchMethod):
             if now_node.get_depth() == config.max_subtask_chain_length - 1:
                 function_call = {"name": "subtask_submit"}
 
-            file_archi, _, = toolserver_interface.execute_command_client(
-                "FileSystemEnv_print_filesys_struture",{"return_root":True})
+            _,file_archi = reacttoolexecutor.get_interface_for_type(ToolType.ToolServer).execute("FileSystemEnv_print_filesys_struture",return_root=True)
             file_archi,length = clip_text(file_archi,1000,clip_end=True)
                 
             human_prompt = ""
@@ -194,27 +193,38 @@ class ReACTChainSearch(BaseSearchMethod):
                 additional_messages=message_sequence,
                 additional_insert_index=-1
             )
-            new_tree_node = agent.message_to_tool_node(new_message)
+            new_tree_node:ToolNode = agent.message_to_tool_node(new_message)
 
             print_data = print_assistant_thoughts(
                 new_tree_node.data, False
             )
 
-            tool_output, tool_output_status_code, need_for_plan_refine, using_tools = function_handler.handle_tool_call(
-                new_tree_node, task_handler)
-            self.need_for_plan_refine = need_for_plan_refine
-
+            # tool_output, tool_output_status_code, need_for_plan_refine, 
+            # using_tools = function_handler.handle_tool_call(
+            #     new_tree_node, task_handler)
+            # self.need_for_plan_refine = need_for_plan_refine
+            status_code,tool_output = reacttoolexecutor.execute(new_tree_node)
+            using_tools = {
+                "tool_name": new_tree_node.tool_name,
+                "tool_input": new_tree_node.tool_args,
+                "tool_output": tool_output,
+                "tool_status_code": status_code.name,
+                "thought_data": {"thought": new_tree_node.thought, "content": new_tree_node.content}
+            }
+            if new_tree_node.tool_name == 'subtask_submit':
+                self.need_for_plan_refine = new_tree_node.tool_args['suggestions_for_latter_subtasks_plan']['need_for_plan_refine']
+            
             now_attempt_tree.make_father_relation(now_node, new_tree_node)
 
             await task_handler.interaction.update_cache(update_data={**print_data, "using_tools": using_tools}, status="inner", current=task_id)
 
             now_node = new_tree_node
 
-            if tool_output_status_code == ToolCallStatusCode.SUBMIT_AS_SUCCESS:
+            if status_code == ToolCallStatusCode.SUBMIT_AS_SUCCESS:
 
                 self.status = SearchMethodStatusCode.HAVE_AT_LEAST_ONE_ANSWER
                 break
-            elif tool_output_status_code == ToolCallStatusCode.SUBMIT_AS_FAILED:
+            elif status_code == ToolCallStatusCode.SUBMIT_AS_FAILED:
                 break
 
         self.finish_node = now_node

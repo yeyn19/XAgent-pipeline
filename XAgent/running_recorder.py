@@ -8,7 +8,7 @@ from copy import deepcopy
 from colorama import Fore, Style
 from XAgent.logs import logger
 from XAgent.workflow.base_query import AutoGPTQuery
-from XAgent.config import XAgentConfig, CONFIG
+from XAgent.config import XAgentConfig, CONFIG,ARGS
 
 def dump_common_things(object):
     if type(object) in [str, int, float, bool]:
@@ -29,6 +29,7 @@ class RunningRecoder():
         strip = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime(now / 1000)) + uuid.uuid4().hex[:8]
 
         self.record_root_dir = os.path.join(record_root_dir, strip)
+        ARGS['record_dir'] = self.record_root_dir
         os.makedirs(self.record_root_dir, exist_ok=True)
 
         for subdir_name in ["LLM_inout_pair", "tool_server_pair"]:

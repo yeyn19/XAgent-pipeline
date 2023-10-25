@@ -10,10 +10,11 @@ from XAgent.workflow.base_query import BaseQuery
 from XAgent.global_vars import agent_dispatcher
 from XAgent.utils import TaskSaveItem, RequiredAbilities, PlanOperationStatusCode, TaskStatusCode
 from XAgent.message_history import Message
-from XAgent.data_structure.plan import Plan
+from XAgent.data_structure import Plan,ToolNode,ToolType
 from XAgent.ai_functions import  function_manager
 from XAgent.running_recorder import recorder
-from XAgent.tool_call_handle import toolserver_interface
+# from XAgent.tool_call_handle import toolserver_interface
+from XAgent.tools import reacttoolexecutor
 from XAgent.agent.summarize import summarize_plan,clip_text
 from XAgent.config import CONFIG
 def plan_function_output_parser(function_output_item: dict) -> Plan:
@@ -154,7 +155,11 @@ class PlanAgent():
             refine_node_message = refine_node_message["suggestions_for_latter_subtasks_plan"]["reason"]
         except:
             refine_node_message = ""
-        workspace_files = str(toolserver_interface.execute_command_client("FileSystemEnv_print_filesys_struture", {"return_root":True}))
+            
+        _,file_archi = reacttoolexecutor.get_interface_for_type(ToolType.ToolServer).execute("FileSystemEnv_print_filesys_struture",return_root=True)
+
+        
+        workspace_files = str(file_archi)
         workspace_files,length = clip_text(workspace_files,1000,clip_end=True)
                 
         while modify_steps < max_step:
