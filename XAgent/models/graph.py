@@ -50,7 +50,7 @@ class ExecutionGraph(BaseModel):
                 if node.node_id in all_visited_nodes:
                     return None
                 all_visited_nodes.add(node.node_id)
-                node_json = node.model_dump_json()
+                node_json = node.model_dump()
                 for next_node in self.get_adjacent_node(node):
                     next_node_dict = dfs(self.nodes[next_node])
                     if next_node_dict is not None:
