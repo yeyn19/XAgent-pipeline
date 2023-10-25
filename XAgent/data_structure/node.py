@@ -6,7 +6,7 @@ from typing import List
 from dataclasses import dataclass
 
 from XAgent.message_history import MessageHistory
-from XAgent.utils import ToolCallStatusCode, TaskStatusCode
+from XAgent.utils import ToolCallStatusCode, TaskStatusCode,ToolType
 
 
 
