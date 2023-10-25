@@ -10,6 +10,8 @@ class ReActEngine(BaseEngine):
     
     
     async def step(self,
+                   task,
+                   plans:dict,
                    toolexecutor:ReActToolExecutor,
                    force_stop:bool=False,
                    interrupt:bool=False,
@@ -21,7 +23,7 @@ class ReActEngine(BaseEngine):
             "",
         )
         
-            
+        
         
         
         
