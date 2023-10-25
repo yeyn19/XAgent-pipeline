@@ -13,6 +13,9 @@ class ExecutionNode(BaseModel):
     in_degree:int = 0
     out_degree:int = 0
     
+    begin_node:bool = False
+    end_node:bool = False
+    
     def __eq__(self, other) -> bool:
         if isinstance(other,ExecutionNode):
             return self.node_id == other.node_id

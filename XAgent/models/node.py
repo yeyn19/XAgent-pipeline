@@ -94,10 +94,3 @@ class ToolNode(Node):
         data = deepcopy(self.data)
         data["tool_status_code"] = data["tool_status_code"].name
         return data
-
-
-
-
-class ExecutionNode(ToolNode):
-    """Node for storing the execution information of the task"""
-    pass
