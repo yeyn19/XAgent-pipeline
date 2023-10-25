@@ -1,3 +1,6 @@
+"""pipeline-automat的执行和选边逻辑
+"""
+
 from typing import Any
 from XAgent.config import CONFIG
 from XAgent.data_structure import ToolNode,ToolType
@@ -6,7 +9,7 @@ from .base import BaseToolExecutor
 from ..interface import BuiltInInterface, ToolServerInterface
 
 
-class ReActToolExecutor(BaseToolExecutor):
+class AutomatExecutor(BaseToolExecutor):
     def __init__(self, config=CONFIG):
         super().__init__(config)
 
@@ -17,3 +20,6 @@ class ReActToolExecutor(BaseToolExecutor):
             ToolType.BuiltIn, BuiltInInterface().lazy_init(config))
         self.set_interface_for_type(
             ToolType.ToolServer, ToolServerInterface().lazy_init(config))
+
+    def execute(self,tool_node:ToolNode, **args)->Tuple[ToolCallStatusCode,Any]:
+        pass

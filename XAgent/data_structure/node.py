@@ -13,23 +13,14 @@ from XAgent.utils import ToolCallStatusCode, TaskStatusCode
 class Node(metaclass = abc.ABCMeta):
     def __init__(self):
         pass
-
-class ToolType(Enum):
-    Default = 'Default'
-    BuiltIn = 'BuildIn'
-    ToolServer = 'ToolServer'
-    Rapid = 'Rapid'
-    N8N = 'N8N'
-    Custom = 'Custom'
-    def __hash__(self):
-        return hash(self.value)
         
 
 class ToolNode(Node):
+    """存储所有工具相关信息的数据结构
+    """
     def __init__(self,data:dict = None,tool_type=ToolType.Default):
         self.tool_type = tool_type
         self.father: ToolNode = None
-        self.children: list[ToolNode] = []
 
         self.expand_num = 0
         if data is not None:
@@ -54,7 +45,6 @@ class ToolNode(Node):
                 "tool_output": "",
                 "tool_status_code": ToolCallStatusCode.TOOL_CALL_SUCCESS,
             }
-        self.history: MessageHistory = MessageHistory()
 
     @property
     def content(self):

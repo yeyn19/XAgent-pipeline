@@ -8,6 +8,8 @@ from XAgent.tools.interface import BaseToolInterface
 from XAgent.utils import ToolCallStatusCode
 
 class BaseToolExecutor:
+    """原子Tool调用可以用默认的executor
+    """
     def __init__(self,config=CONFIG) -> None:
         self.config = config
         self.interfaces:dict[ToolType,BaseToolInterface] = {}
@@ -26,6 +28,8 @@ class BaseToolExecutor:
             interface.close()
     
     def get_available_tools(self)->Tuple[list[str],dict]:
+        """flatten所有interface和对应的tool
+        """
         available_tools = []
         tools_json = []
         tool_type_mapping = {}
@@ -39,6 +43,8 @@ class BaseToolExecutor:
         return available_tools,tools_json
     
     def execute(self,tool_node:ToolNode)->Tuple[ToolCallStatusCode,Any]:
+        """执行一个toolNode，返回对应的执行状态码和data
+        """
         logger.typewriter_log(
             "NEXT ACTION: ",
             Fore.CYAN,

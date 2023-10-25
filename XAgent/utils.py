@@ -34,14 +34,24 @@ class LLMStatusCode(Enum):
     SUCCESS = 0
     ERROR = 1
 
+#Tool的设计要保证原子性
+class ToolType(Enum): 
+    Default = 'Default'
+    BuiltIn = 'BuildIn' #Xagent工具
+    ToolServer = 'ToolServer'
+    Rapid = 'Rapid'
+    ToolCombo = "ToolCombo"
+    N8N = 'N8N'
+    Custom = 'Custom'
+    def __hash__(self):
+        return hash(self.value)
 
-@unique
-class ExecutionNodeType(Enum):
-    ReACT= "ReACT"
-    Pipeline = "Pipeline"
-    Custom = "Custom"
-    Controlflow = "Control"
-    N8N = "N8N" # should remove in future
+class ExecutionType(Enum):
+    AtomicTool = auto()
+    ReACTChain = auto()
+    AutoMatProcess = auto()
+    HumanElicitingProcess = auto()
+
 
 
 @unique
@@ -92,11 +102,6 @@ class TaskStatusCode(Enum):
     SUCCESS = 2
     FAIL = 3
     SPLIT = 4 
-
-@unique
-class AutoMatEdgeType(Enum):
-    RuleBased = auto() 
-    NaturalLanguageBased = auto()
 
 
 @unique
