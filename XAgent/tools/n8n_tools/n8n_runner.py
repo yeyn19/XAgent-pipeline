@@ -9,7 +9,7 @@ import uuid
 
 from XAgent.tools.n8n_tools.n8n_node import n8nPythonNode
 from XAgent.tools.n8n_tools.n8n_credential_loader import n8n_credentials
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 success_prompt = """Execution was successful:
 ====================================

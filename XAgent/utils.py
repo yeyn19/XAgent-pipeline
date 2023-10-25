@@ -36,13 +36,11 @@ class LLMStatusCode(Enum):
 
 
 @unique
-class ToolType(Enum):
-    XAgentTool = "XAgent"
-    ReACTTool = "ReACT"
-    n8nTool = "n8n"
-    CallOtherPipelineTool = "pipeline"
-    CustomizedTool = "custom"
-    ControlflowTool = "control"
+class ExecutionNodeType(Enum):
+    ReACT= "ReACT"
+    Pipeline = "Pipeline"
+    Custom = "Custom"
+    Controlflow = "Control"
 
 
 @unique

@@ -2,7 +2,7 @@ from typing import List, Optional
 from XAgent.utils import TaskSaveItem, TaskStatusCode
 from XAgent.data_structure.node import ToolNode
 
-class Plan():
+class Plan:
     def __init__(self, data: TaskSaveItem):
         self.father: Optional[Plan] = None
         self.children: List[Plan] = []

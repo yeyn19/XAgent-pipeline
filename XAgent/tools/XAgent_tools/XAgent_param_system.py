@@ -2,9 +2,10 @@ import json
 from colorama import Fore, Style
 
 from XAgent.utils import ToolCallStatusCode
-from XAgent.tools.XAgent_tools.tool_call_handle import toolserver_interface
+from XAgent.tools import reacttoolexecutor
+from XAgent.data_structure import ToolNode
 from XAgent.tools.param_system import ParamSystem
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 
 class XAgentParamSystem(ParamSystem):
@@ -36,22 +37,9 @@ class XAgentParamSystem(ParamSystem):
             f"COMMAND: {Fore.CYAN}{self.tool_name}{Style.RESET_ALL}  \n"
             f"ARGUMENTS: \n{Fore.CYAN}{json.dumps(self.params)}{Style.RESET_ALL}",
         )
+        tool_node = ToolNode()
+        tool_node.tool_name = self.tool_name
+        tool_node.tool_args = self.params
+        status_code,tool_output = reacttoolexecutor.execute(tool_node)
 
-        command_result, tool_output_status_code = toolserver_interface.execute_command_client(
-            command_name=self.tool_name,
-            arguments=self.params
-        )
-        MAX_RETRY = 10
-        retry_time = 0
-        while retry_time<MAX_RETRY and tool_output_status_code == ToolCallStatusCode.TIMEOUT_ERROR and isinstance(command_result['detail'],dict) and 'type' in command_result['detail'] and command_result['detail']['type']=='retry':
-            time.sleep(3)
-            retry_time += 1
-            command_result, tool_output_status_code, = toolserver_interface.execute_command_client(
-                command_result['detail']['next_calling'],
-                command_result['detail']['arguments'],
-            )
-
-        if tool_output_status_code == ToolCallStatusCode.TIMEOUT_ERROR and retry_time==MAX_RETRY:
-            command_result = "Timeout and no content returned! Please check the content you submit!"
-
-        return command_result, tool_output_status_code
+        return tool_output, status_code

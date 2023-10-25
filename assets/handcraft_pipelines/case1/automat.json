@@ -11,27 +11,27 @@
         {
             "node_name": "start",
             "tool_name": "start",
-            "tool_type": "control"
+            "node_type": "Control"
         },
         {
             "node_name": "google sheet read",
             "tool_name": "googleSheets.sheet.read",
-            "tool_type": "n8n"
+            "node_type": "ReACT"
         },
         {
             "node_name": "send gmail",
             "tool_name": "gmail.message.send",
-            "tool_type": "n8n"
+            "node_type": "ReACT"
         },   
         {
             "node_name": "slack send message",
             "tool_name": "slack.message.post",
-            "tool_type": "n8n"
+            "node_type": "ReACT"
         },
         {
             "node_name": "print_file_system",
             "tool_name": "FileSystemEnv_print_filesys_struture",
-            "tool_type": "XAgent"
+            "node_type": "ReACT"
         }
     ],
 

@@ -5,7 +5,7 @@ import json
 
 from XAgent.inner_loop_search_algorithms.pipeline_runner import run_pipeline
 from XAgent.data_structure.pipeline_automat import PipelineAutoMat
-from XAgent.tools.XAgent_tools.tool_call_handle import toolserver_interface
+from XAgent.tools import reacttoolexecutor
 from copy import deepcopy
 from XAgent.config import CONFIG,ARGS
 from command import CommandLine,XAgentServerEnv
@@ -37,8 +37,7 @@ def parse_args():
 if __name__ == '__main__':
     # args = parse_args()
     CONFIG.reload("./assets/private.yml")
-    toolserver_interface.lazy_init(CONFIG)
-    output = toolserver_interface.get_available_tools()
+    reacttoolexecutor.lazy_init(CONFIG)
 
 
     pipeline_dir = "./assets/handcraft_pipelines/case1"

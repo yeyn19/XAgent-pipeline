@@ -2,7 +2,7 @@ import json
 from typing import List, Dict
 from copy import deepcopy
 
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.tools.param_system import ParamSystem
 from XAgent.tools.n8n_tools.n8n_utils import NodeType, n8nNodeMeta
 from XAgent.tools.n8n_tools.n8n_node import n8nPythonNode

@@ -8,10 +8,9 @@ import importlib
 import uuid
 import types
 
-from XAgent.utils import AutoMatEdgeType, AutoMatStateChangeHardness, ToolType, ToolCallStatusCode
+from XAgent.utils import AutoMatEdgeType, AutoMatStateChangeHardness,ExecutionNodeType, ToolCallStatusCode
 from XAgent.tools.param_system import ParamSystem
-from XAgent.tools.param_system_interface import get_param_system
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 
 
@@ -67,7 +66,7 @@ class PipelineAutoMatNode():
     """一个自动机节点"""
     node_name: str
     tool_name: str
-    tool_type: ToolType
+    node_type: ExecutionNodeType
     state_change_hardness: AutoMatStateChangeHardness = AutoMatStateChangeHardness.GPT4
 
     param_interface: Optional[ParamSystem] = None
@@ -81,7 +80,7 @@ class PipelineAutoMatNode():
         new_node = PipelineAutoMatNode(
                         node_name=node["node_name"],
                         tool_name=node["tool_name"],
-                        tool_type=ToolType(node["tool_type"]),
+                        node_type=ExecutionNodeType(node["node_type"]),
                     )
         # TODO: other params?
         return new_node
@@ -93,7 +92,7 @@ class PipelineAutoMatNode():
         new_node = PipelineAutoMatNode(
                         node_name=uuid.uuid1(),
                         tool_name="",
-                        tool_type=ToolType.ReACTTool,
+                        node_type=ExecutionNodeType.ReACT,
                     )
         # TODO: other params?
         return new_node
@@ -162,6 +161,7 @@ class PipelineAutoMat():
         automat.meta = PipelineMeta.from_json(json_data["meta"])
         for node in json_data["nodes"]:
             new_node = PipelineAutoMatNode.from_json(node)
+            from XAgent.tools.param_system_interface import get_param_system
             new_node.param_interface = get_param_system(new_node.tool_name, new_node.tool_type)
 
             function_name = f"route_node_{new_node.node_name}"
@@ -176,7 +176,7 @@ class PipelineAutoMat():
                 logger.typewriter_log(f"node \"{new_node.node_name}\"({new_node.tool_name}):",Fore.BLUE, "use default route-function")
 
             automat.nodes.append(new_node)
-            if new_node.tool_type == ToolType.ControlflowTool and new_node.tool_name == "start":
+            if new_node.node_type == ExecutionNodeType.Controlflow and new_node.tool_name == "start":
                 automat.start_node = new_node
             
         for edge in json_data["edges"]:
