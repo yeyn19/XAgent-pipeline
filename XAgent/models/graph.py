@@ -36,7 +36,8 @@ class DirectedEdge(BaseModel):
         return str(self.edge_id)
     
 class ExecutionGraph(BaseModel):
-    init_node:Optional[GID] = None
+    begin_node:Optional[GID] = None
+    end_node:Optional[GID] = None
     nodes:Dict[GID,ExecutionNode] = {}
     edges:Dict[GID,Dict[GID,DirectedEdge]] = {}
     
@@ -67,8 +68,8 @@ class ExecutionGraph(BaseModel):
     def reduce_graph_to_sequence(self):
         # random walk to a leaf node
         eg = ExecutionGraph()
-        node = self.nodes[self.init_node]
-        eg.set_init_node(node)
+        node = self.nodes[self.begin_node]
+        eg.set_begin_node(node)
         last_node = node
         adj_nodes = self.get_adjacent_node(node)
         while len(adj_nodes)>0:
@@ -89,21 +90,38 @@ class ExecutionGraph(BaseModel):
             count += len(d.keys())
         return count
     
-    def set_init_node(self,node:Union[GID,ExecutionNode]):
+    def set_begin_node(self,node:Union[GID,ExecutionNode]):
         if isinstance(node,ExecutionNode):
-            self.init_node = node.node_id
+            self.begin_node = node.node_id
             if node.node_id not in self.nodes:
                 self.nodes[node.node_id] = node
         elif isinstance(node,GID):
             if node not in self.nodes:
                 raise KeyError('node not in graph!')
             else:
-                self.init_node = node
+                self.begin_node = node
         else:
             raise TypeError('node must be instance of ExecutionNode!')
         
-    def get_init_node(self):
-        return self.nodes[self.init_node]
+    def get_begin_node(self):
+        return self.nodes[self.begin_node]
+    
+    
+    def set_end_node(self,node:Union[GID,ExecutionNode]):
+        if isinstance(node,ExecutionNode):
+            self.end_node = node.node_id
+            if node.node_id not in self.nodes:
+                self.nodes[node.node_id] = node
+        elif isinstance(node,GID):
+            if node not in self.nodes:
+                raise KeyError('node not in graph!')
+            else:
+                self.end_node = node
+        else:
+            raise TypeError('node must be instance of ExecutionNode!')
+        
+    def get_end_node(self):
+        return self.nodes[self.end_node]
     
     def add_node(self,node:ExecutionNode):
         if isinstance(node,ExecutionNode):

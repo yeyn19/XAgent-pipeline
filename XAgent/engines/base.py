@@ -11,7 +11,7 @@ class BaseEngine:
         self.config = config
     
     
-    async def step(self,*args,**kwargs)->ExecutionNode:
+    async def step(self,force_stop:bool=False,*args,**kwargs)->ExecutionNode:
         """Step and return execution result."""
         raise NotImplementedError
     
@@ -19,10 +19,14 @@ class BaseEngine:
         """Execute the engine and return the result node."""
         execution_trace = ExecutionGraph()
         begin_node = ExecutionNode(begin_node=True)
+        execution_trace.set_begin_node(begin_node)
+        
         
         node = begin_node
         while node.end_node != False:
-            nnode = await self.step(*args,**kwargs)
+            nnode = await self.step(
+                force_stop = execution_trace.node_count >= self.config.max_subtask_chain_length,
+                *args,**kwargs)
             
             execution_trace.add_node(nnode)
             execution_trace.add_edge(node,nnode)
@@ -32,6 +36,8 @@ class BaseEngine:
             if INTERRUPT:
                 break
             
+        execution_trace.set_end_node(node)
+        
         return execution_trace
         
         
