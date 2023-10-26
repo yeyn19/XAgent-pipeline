@@ -4,7 +4,7 @@ import json
 from colorama import Fore, Style
 
 from XAgent.config import CONFIG
-from XAgent.tools import ToolServerInterface, BuiltInInterface
+from XAgent.tools import ToolServerInterface, BuiltInInterface, n8nToolInterface, CustomizedToolInterface
 from XAgent.logs import logger
 from XAgent.utils import has_route_function
 from XAgent.models import ExecutionNode,ExecutionGraph, ToolNode, TaskNode, Plan, ReActExecutionGraph
@@ -41,7 +41,9 @@ class PipelineV2Engine(BaseEngine):
         super().__init__(config)
 
         self.toolserverif = ToolServerInterface()
-        self.toolifs = [self.toolserverif]
+        self.n8nif = n8nToolInterface()
+        self.customif = CustomizedToolInterface()
+        self.toolifs = [self.toolserverif, self.n8nif, self.customif]
     
     async def step(self,
                    node: PipelineAutoMatNode,
@@ -51,7 +53,7 @@ class PipelineV2Engine(BaseEngine):
                    *args,**kwargs)->ExecutionNode:
         match node.node_type:
 
-            case ExecutionNodeTypeForPipelineUserInterface.ToolServer:
+            case ExecutionNodeTypeForPipelineUserInterface.ToolServer | ExecutionNodeTypeForPipelineUserInterface.N8N | ExecutionNodeTypeForPipelineUserInterface.Custom:
                 prior_tool_node = ToolNode()
                 prior_tool_node.set_tool(
                     tool_name=node.tool_name,

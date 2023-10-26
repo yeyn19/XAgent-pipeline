@@ -5,7 +5,7 @@
 workspace_cache/
 
 XAgent/logs/
-XAgent/tools/n8n_tools/credentials/*
+XAgent/tools/n8n_tools/n8n_credentials/*
 running_records/
 
 XAgentServer/localstorage

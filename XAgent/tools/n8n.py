@@ -26,7 +26,7 @@ class n8nToolInterface(BaseToolInterface):
         pass
     
     def get_available_tools(self)->Tuple[list[str],dict]:
-        pass
+        return self.n8n_compiler.get_available_tools()
     
     def retrieve_tools(self, query:str, top_k:int=10)->dict:
         pass
@@ -47,11 +47,11 @@ class n8nToolInterface(BaseToolInterface):
         else:
             raise NotImplementedError
     
-    def execute(self, tool_name:str, given_param_dict,input_data)->Tuple[ToolCallStatusCode,Any]:
+    def execute(self, tool_name:str, **kwargs)->Tuple[ToolCallStatusCode,Any]:
         integration_name, resource_name, operation_name = tool_name.split(".")
         n8n_node = self.n8n_compiler.get_n8n_node(integration_name, resource_name, operation_name)
         logger.typewriter_log("prepare params for n8n node: ",Fore.BLUE, f"{n8n_node.node_meta.integration_name}.{n8n_node.node_meta.resource_name}.{n8n_node.node_meta.operation_name}")
-        param_rewrite_status, parse_output = n8n_node.parse_parameters(given_param_dict)
+        param_rewrite_status, parse_output = n8n_node.parse_parameters(kwargs)
 
         if param_rewrite_status != n8nParamParseStatus.ParamParseSuccess:
             logger.typewriter_log("param parse error", Fore.RED, f"{param_rewrite_status.name}: {json.dumps(parse_output)}")

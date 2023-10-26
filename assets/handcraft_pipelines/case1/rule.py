@@ -1,18 +1,20 @@
 from XAgent.models.pipeline_automat import PipelineAutoMat, PipelineAutoMatEdge, PipelineRouteResult,  PipelineRuntimeStackUserInterface
 
-
+# params = {
+#     "select": "channel",
+#     "channelId": {
+#         "value": "#general",
+#         "mode": "name"
+#     },
+#     "text": "hello world, I am XAgent-pipeline",
+#     "otherOptions": {}
+# }
 def route_edge_1(edge_info: PipelineAutoMatEdge, pipeline: PipelineAutoMat, runtime_stack: PipelineRuntimeStackUserInterface) -> PipelineRouteResult:
     """给边1写规则。返回是否选边，以及传参
     """
     print(f"dynamically running user provided function\"route_1\"")
     params = {
-        "select": "channel",
-        "channelId": {
-            "value": "#general",
-            "mode": "name"
-        },
-        "text": "hello world, I am XAgent-pipeline",
-        "otherOptions": {}
+        "expression": "1+2+3*5"
     }
     from_node, to_node = pipeline.get_edge_nodes(edge_info)
     return PipelineRouteResult(
@@ -44,6 +46,8 @@ def route_edge_3(edge_info: PipelineAutoMatEdge, pipeline: PipelineAutoMat, runt
     """给边1写规则。返回是否选边，以及传参
     """
     params = {
+        "filepath":"./a.txt",
+        "content": "nmsl",
     }
     from_node, to_node = pipeline.get_edge_nodes(edge_info)
     return PipelineRouteResult(
@@ -58,10 +62,7 @@ def route_edge_3(edge_info: PipelineAutoMatEdge, pipeline: PipelineAutoMat, runt
 def route_edge_4(edge_info: PipelineAutoMatEdge, pipeline: PipelineAutoMat, runtime_stack: PipelineRuntimeStackUserInterface) -> PipelineRouteResult:
     """给边1写规则。返回是否选边，以及传参
     """
-    params = {
-        "file_path":"./a.txt",
-        "content": "nmsl",
-    }
+    params = {}
     from_node, to_node = pipeline.get_edge_nodes(edge_info)
     return PipelineRouteResult(
         select_this_edge=True,
