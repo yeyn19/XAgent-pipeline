@@ -5,7 +5,6 @@ from XAgent.agent.dispatcher import agent_dispatcher
 from XAgent.config import CONFIG as __config
 from XAgent.tools import ReActToolExecutor, ToolServerInterface
 
-global_tool_server_interface = ToolServerInterface()
 reacttoolexecutor = ReActToolExecutor(__config)
 INTERRUPT = False
 INTERRUPT_MESSAGE = None

@@ -4,8 +4,8 @@ from enum import Enum, unique
 from copy import deepcopy
 import json
 
-from XAgent.tools.n8n_tools.n8n_utils import n8nNodeMeta, n8nParamParseStatus, NodeType
-from XAgent.tools.n8n_tools.n8n_params import n8nParameter
+from .n8n_utils import n8nNodeMeta, n8nParamParseStatus, NodeType
+from .n8n_params import n8nParameter
 
 
 @dataclass
@@ -73,7 +73,7 @@ class n8nPythonNode():
 
         return lines 
     
-    def parse_parameters(self, param_json: dict) -> (n8nParamParseStatus, str):
+    def parse_parameters(self, param_json: dict) -> (n8nParamParseStatus, dict):
         """对于一个输入的参数，检查是否符合params格式
         """
         new_params = deepcopy(self.params)
@@ -84,16 +84,16 @@ class n8nPythonNode():
 
         if not isinstance(param_json, dict):
             tool_status = n8nParamParseStatus.ParamTypeError
-            return tool_status, json.dumps({"error": f"Parameter Type Error: The parameter is expected to be a json format string which can be parsed as dict type. However, you are giving string parsed as {type(param_json)}", "result": "Nothing happened.", "status": tool_status.name})
+            return tool_status, {"error": f"Parameter Type Error: The parameter is expected to be a json format string which can be parsed as dict type. However, you are giving string parsed as {type(param_json)}", "result": "Nothing happened.", "status": tool_status.name}
 
         for key in param_json.keys():
             if key not in new_params.keys():
                 tool_status = n8nParamParseStatus.UndefinedParam
-                return tool_status, json.dumps({"error": f"Undefined input parameter \"{key}\" for {self.get_name()}.Supported parameters: {list(new_params.keys())}", "result": "Nothing happened.", "status": tool_status.name})
+                return tool_status, {"error": f"Undefined input parameter \"{key}\" for {self.get_name()}.Supported parameters: {list(new_params.keys())}", "result": "Nothing happened.", "status": tool_status.name}
             parse_status, parse_output = new_params[key].parse_value(param_json[key])
             if parse_status != n8nParamParseStatus.ParamParseSuccess:
                 tool_status = parse_status
-                return tool_status, json.dumps({"error": f"{parse_output}", "result": "Nothing Happened", "status": tool_status.name})
+                return tool_status, {"error": f"{parse_output}", "result": "Nothing Happened", "status": tool_status.name}
             tool_call_result.append(parse_output)
 
         #所有param都没问题，

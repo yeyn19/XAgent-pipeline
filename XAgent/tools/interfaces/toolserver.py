@@ -16,14 +16,13 @@ class ToolServerInterface(BaseToolInterface):
     def lazy_init(self, config):
         self.config = config
         if config.selfhost_toolserver_url is not None:
-            self.url = config.selfhost_toolserver_url
+            if getattr(self,'url','') != config.selfhost_toolserver_url:
+                self.url = config.selfhost_toolserver_url
+                logger.typewriter_log("ToolServer connected in", Fore.GREEN, self.url)
+                response = requests.post(f'{self.url}/get_cookie',)
+                self.cookies = response.cookies
         else:
             raise NotImplementedError('Please use selfhost toolserver')
-        logger.typewriter_log("ToolServer connected in", Fore.GREEN, self.url)
-        response = requests.post(f'{self.url}/get_cookie',)
-        self.cookies = response.cookies
-
-    
         return self
 
     def close(self):

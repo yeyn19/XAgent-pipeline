@@ -4,33 +4,16 @@ import json
 from colorama import Fore, Style
 
 from XAgent.config import CONFIG
-from XAgent.tools import BaseToolExecutor, ToolServerInterface
+from XAgent.tools import BaseToolExecutor, ToolServerInterface, PipeToolExecutor
 from XAgent.logs import logger
 from XAgent.utils import has_route_function
 from XAgent.models import ExecutionNode,ExecutionGraph, ToolNode
 from XAgent.enums import ToolType
-from XAgent.global_vars import INTERRUPT, global_tool_server_interface
+from XAgent.global_vars import INTERRUPT
+from .base import BaseEngine
 
 from XAgent.models.pipeline_automat import *
 
-def execute_automat_node(node: PipelineAutoMatNode, route_result: PipelineRouteResult):
-    match node.node_type:
-        case ExecutionNodeTypeForPipelineUserInterface.ToolServer:
-            prior_tool_node = ToolNode(tool_type=ToolType.ToolServer)
-            prior_tool_node.set_tool(
-                tool_name=node.tool_name,
-                tool_args = route_result.provide_params,
-            )
-            baseexecutor = BaseToolExecutor(CONFIG)
-            baseexecutor.set_interface_for_type(
-                tool_type = ToolType.ToolServer,
-                interface=global_tool_server_interface,
-            )
-            status_code, output_data = baseexecutor.execute(prior_tool_node)
-            return status_code, output_data, prior_tool_node
-        case _:
-            logger.typewriter_log("Not implemented", Fore.RED, node.node_type.name)
-            raise NotImplementedError
     
 
 
@@ -52,20 +35,33 @@ def ai_route_function(now_node: PipelineAutoMatNode, pipeline: PipelineAutoMat, 
     raise NotImplementedError
 
 
-class PipelineV2Engine:
+class PipelineV2Engine(BaseEngine):
     """Execute a pipeline as a automat."""
     def __init__(self, config=CONFIG):
         self.config = config
+        self.pipe_executor =  PipeToolExecutor()
+        self.pipe_executor.lazy_init(self.config)
     
     
     async def step(self,
-                   task,
-                   plans:dict,
+                   node: PipelineAutoMatNode,
+                   route_result: PipelineRouteResult,
                    force_stop:bool=False,
                    interrupt:bool=False,
                    *args,**kwargs)->ExecutionNode:
-        """Step and return execution result."""
-        raise NotImplementedError
+        match node.node_type:
+
+            case ExecutionNodeTypeForPipelineUserInterface.ToolServer:
+                prior_tool_node = ToolNode()
+                prior_tool_node.set_tool(
+                    tool_name=node.tool_name,
+                    tool_args=route_result.provide_params,
+                )
+                status_code, output_data = self.pipe_executor.execute(prior_tool_node)
+                return status_code, output_data, prior_tool_node
+            case _:
+                logger.typewriter_log("Not implemented", Fore.RED, node.node_type.name)
+                raise NotImplementedError
     
     async def run(self,pipeline_dir,**kwargs)->ExecutionGraph:
         
@@ -119,7 +115,7 @@ class PipelineV2Engine:
             assert route_result.param_sufficient
 
             #执行工具调用
-            status_code, output_data, prior_tool_node = execute_automat_node(next_node, route_result)
+            status_code, output_data, prior_tool_node = await self.step(next_node, route_result)
             
             runtime_node = PipelineRuntimeNode(
                                 route_result=route_result,

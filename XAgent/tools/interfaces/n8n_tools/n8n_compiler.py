@@ -3,10 +3,11 @@ from typing import List, Dict
 from copy import deepcopy
 
 from XAgent.logs import logger
+from XAgent.config import CONFIG
 from XAgent.engines.param_system import ParamSystem
-from XAgent.tools.n8n_tools.n8n_utils import NodeType, n8nNodeMeta
-from XAgent.tools.n8n_tools.n8n_node import n8nPythonNode
-from XAgent.tools.n8n_tools.n8n_param_parser import parse_properties
+from .n8n_utils import NodeType, n8nNodeMeta
+from .n8n_node import n8nPythonNode
+from .n8n_param_parser import parse_properties
 
 
 class n8nCompiler():
@@ -14,8 +15,8 @@ class n8nCompiler():
     """
 
 
-    def __init__(self):
-        self.resolve()
+    def __init__(self,config):
+        self.resolve(config)
 
 
 
@@ -101,12 +102,8 @@ class n8nCompiler():
         # print(self.cfg.parser.nodes_whtie_list)
         self.json_data = []
         self.flattened_tools = {}
-        white_list = [
-            "slack.message.post",
-            "googleSheets.sheet.read",
-            "gmail.message.send",
-        ]
-        nodes_json_path = "XAgent/tools/n8n_tools/n8n_nodes.json"
+        white_list = CONFIG.n8n_whitelist
+        nodes_json_path = "./tools/n8n_tools/n8n_nodes.json"
 
         available_integrations = [item.split(".")[0] for item in white_list]
         with open(nodes_json_path, "r", encoding="utf-8") as reader:
@@ -153,5 +150,3 @@ class n8nCompiler():
         new_node.params = parse_properties(new_node)
         new_node.update_implement_info()
         return new_node
-
-n8n_compiler = n8nCompiler() 

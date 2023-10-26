@@ -6,5 +6,5 @@ The ToolExecutor is responsible to execute the tools and manage multiple tool in
 """
 
 
-from .executor import BaseToolExecutor,ReActToolExecutor
+from .executor import BaseToolExecutor,ReActToolExecutor, PipeToolExecutor
 from .interfaces import BaseToolInterface,ToolServerInterface,BuiltInInterface

@@ -2,3 +2,4 @@
 
 from .base import BaseToolExecutor
 from .react import ReActToolExecutor
+from .pipe import PipeToolExecutor
