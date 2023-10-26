@@ -40,10 +40,6 @@ if __name__ == '__main__':
     os.environ['CONFIG_FILE'] = "assets/private.yml"
     CONFIG.reload(config_file="assets/private.yml")
 
-    if args.quiet:
-        original_stdout = sys.stdout
-        from XAgent.running_recorder import recorder
-        sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
     
     
     args = vars(args)
@@ -64,6 +60,12 @@ if __name__ == '__main__':
     # )
     # asyncio.run(pipeline_engine.run(task))
     # exit()
+    
+    if args.get('quiet',False):
+        original_stdout = sys.stdout
+        from XAgent.running_recorder import recorder
+        sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
+        
     cmd = CommandLine(XAgentServerEnv)
     cmd.start(
         args['task'],
@@ -71,7 +73,7 @@ if __name__ == '__main__':
         mode=args['mode'],
         upload_files=args['upload_files'],
     )
-    if args.quiet:
+    if args.get('quiet',False):
         sys.stdout.close()
         sys.stdout = original_stdout
     

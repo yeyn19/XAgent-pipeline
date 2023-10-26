@@ -6,7 +6,7 @@ from .graph import ExecutionGraph,ExecutionNode
 
 
 
-class ToolExecutionNode(ExecutionNode):
+class ReActExecutionNode(ExecutionNode):
     tool_call:ToolNode = None
     status_code:ToolCallStatusCode = ToolCallStatusCode.OTHER_ERROR
     

@@ -7,7 +7,7 @@ from XAgent.global_vars import INTERRUPT,agent_dispatcher
 from XAgent.ai_functions import function_manager
 from XAgent.tools import ToolServerInterface,BuiltInInterface
 
-from XAgent.models import ToolExecutionNode,ReActExecutionGraph
+from XAgent.models import ReActExecutionNode,ReActExecutionGraph
 from XAgent.enums import RequiredAbilities,EngineExecutionStatusCode,ToolCallStatusCode
 from XAgent.message_history import Message
 
@@ -26,13 +26,13 @@ class ReActEngine(BaseEngine):
         
     async def step(self,
                    task:dict,
-                   past_steps:list[ToolExecutionNode],
+                   past_steps:list[ReActExecutionNode],
                    plans:dict = None,
                    functions:list[dict]=[],
                    force_stop:bool=False,
                    interrupt:bool=False,
                    finish_tool_call:str='subtask_submit',
-                   **kwargs)->ToolExecutionNode:
+                   **kwargs)->ReActExecutionNode:
         """Step and return execution result."""    
         logger.typewriter_log(
             "-=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-=",
@@ -93,7 +93,7 @@ class ReActEngine(BaseEngine):
         )
         
         
-        exec_node = ToolExecutionNode(tool_call=self.agent.message_to_tool_node(message))
+        exec_node = ReActExecutionNode(tool_call=self.agent.message_to_tool_node(message))
         
         thoughts = print_assistant_thoughts(exec_node.tool_call.data, False)
 
