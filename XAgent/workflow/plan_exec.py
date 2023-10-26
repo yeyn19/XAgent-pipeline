@@ -12,18 +12,19 @@ from XAgent.utils import TaskSaveItem
 from XAgent.message_history import Message
 from XAgent.models import Plan,ToolNode
 from XAgent.enums import ToolType,TaskStatusCode,RequiredAbilities,PlanOperationStatusCode
+from XAgent.tools import ToolServerInterface
 from XAgent.ai_functions import  function_manager
 from XAgent.running_recorder import recorder
 # from XAgent.tool_call_handle import toolserver_interface
-from XAgent.global_vars import reacttoolexecutor
 from XAgent.agent.summarize import summarize_plan,clip_text
 from XAgent.config import CONFIG
 def plan_function_output_parser(function_output_item: dict) -> Plan:
     subtask_node = TaskSaveItem()
     subtask_node.load_from_json(function_output_item=function_output_item)
-    subplan = Plan(subtask_node)
+    subplan = Plan(data=subtask_node)
     return subplan
 
+toolserver_if = ToolServerInterface()
 
 class PlanRefineChain():
     def __init__(self, init_plan):
@@ -157,7 +158,7 @@ class PlanAgent():
         except:
             refine_node_message = ""
             
-        _,file_archi = reacttoolexecutor.get_interface_for_type(ToolType.ToolServer).execute("FileSystemEnv_print_filesys_struture",return_root=True)
+        _,file_archi = toolserver_if.get_interface_for_type(ToolType.ToolServer).execute("FileSystemEnv_print_filesys_struture",return_root=True)
 
         
         workspace_files = str(file_archi)

@@ -1,13 +1,14 @@
+from pydantic import BaseModel
 from typing import List, Optional
 from XAgent.utils import TaskSaveItem, TaskStatusCode
 from XAgent.models import ToolNode
 
-class Plan:
-    def __init__(self, data: TaskSaveItem):
-        self.father: Optional[Plan] = None
-        self.children: List[Plan] = []
-        self.data: TaskSaveItem = data
-        self.process_node: ToolNode = None 
+class Plan(BaseModel):
+    father: Optional['Plan'] = None
+    children: List['Plan'] = []
+    data: TaskSaveItem
+    process_node: ToolNode = None 
+
     
     def to_json(self, posterior=True):
         root_json = self.data.to_json(posterior=posterior)

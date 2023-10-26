@@ -4,16 +4,13 @@ from typing import Dict, List
 
 from colorama import Fore
 
-from XAgent.global_vars import agent_dispatcher
 from XAgent.engines import ReActEngine
 from XAgent.logs import logger, print_task_save_items
-from XAgent.ai_functions import function_manager
 from XAgent.running_recorder import recorder
-from XAgent.global_vars import reacttoolexecutor
-# from XAgent.tool_call_handle import function_handler, toolserver_interface
 from XAgent.agent.summarize import summarize_plan 
-from XAgent.enums import ToolType,RequiredAbilities, SearchMethodStatusCode,TaskStatusCode
-from XAgent.utils import TaskSaveItem
+from XAgent.enums import ToolType, SearchMethodStatusCode,TaskStatusCode
+from XAgent.models import TaskNode
+
 from .base_query import BaseQuery
 from .plan_exec import Plan, PlanAgent
 from .reflection import get_posterior_knowledge
@@ -170,22 +167,23 @@ class TaskHandler():
 
         plan.data.status = TaskStatusCode.DOING
 
+        tools_des = []
         if self.config.rapidapi_retrieve_tool_count > 0:  
             retrieve_string = summarize_plan(plan.to_json())
-            tools_des = reacttoolexecutor.get_interface_for_type(ToolType.Rapid).retrieve_tools(retrieve_string, top_k=self.config.rapidapi_retrieve_tool_count)
+            from XAgent.tools import RapidAPIInterface
+            rapidapi_if = RapidAPIInterface()
+            rapidapi_if.lazy_init(self.config)
+            tools_des = rapidapi_if.retrieve_tools(retrieve_string, top_k=self.config.rapidapi_retrieve_tool_count)
             # TODO: fix latter, adding rapid api to the interface with right format
             
 
         react_engine = ReActEngine(config=self.config)
+        react_engine.lazy_init(self.config)
         
-        arguments = function_manager.get_function_schema('action_reasoning')['parameters']
         exec_result = await react_engine.run(
-            task=plan.to_json(),
+            task=TaskNode(plan=plan),
             plans=self.plan_agent.latest_plan.to_json(),
-            toolexecutor=reacttoolexecutor,
-            arguments=arguments,
-            functions=reacttoolexecutor.get_available_tools()[1],
-            task_id=task_ids_str,
+            functions=tools_des,
             interaction=self.interaction,)
 
         if exec_result.status == SearchMethodStatusCode.SUCCESS:

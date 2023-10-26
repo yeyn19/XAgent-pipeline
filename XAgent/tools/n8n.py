@@ -13,7 +13,7 @@ from .n8n_tools.n8n_runner import run_node
 
 class n8nToolInterface(BaseToolInterface):
     """
-    完成n8n的工具调用
+    Run n8n tools.
     """
     def __init__(self,*args,**kwargs) -> None:
         pass

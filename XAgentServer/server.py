@@ -23,8 +23,9 @@ class XAgentServer:
         from XAgent.agent import (PlanGenerateAgent, PlanRefineAgent,
                                   ReflectAgent, ToolAgent)
         from XAgent.config import CONFIG as config
-        from XAgent.global_vars import agent_dispatcher,reacttoolexecutor
+        from XAgent.global_vars import agent_dispatcher
         from XAgent.running_recorder import recorder
+        from XAgent.tools import ToolServerInterface
         # from XAgent.tool_call_handle import (function_handler,
         #                                      toolserver_interface)
         from XAgent.enums import ToolType
@@ -61,12 +62,13 @@ class XAgentServer:
             Fore.RED,
             str(config.enable_ask_human_for_help),
         )
-        reacttoolexecutor.lazy_init(config)
+        toolserver_if = ToolServerInterface()
+        toolserver_if.lazy_init(config)
 
         # working memory function is used for communication between different agents that handle different subtasks
         working_memory_function = WorkingMemoryAgent.get_working_memory_function()
         
-        subtask_functions, tool_functions_description_list = reacttoolexecutor.get_available_tools()
+        subtask_functions, tool_functions_description_list = toolserver_if.get_available_tools()
 
         all_functions = subtask_functions + working_memory_function
 
@@ -84,7 +86,7 @@ class XAgentServer:
             upload_files = [os.path.join(XAgentServerEnv.Upload.upload_dir, interaction.base.user_id, file) for file in upload_files]
             for file_path in upload_files:
                 try:
-                    reacttoolexecutor.get_interface_for_type(ToolType.ToolServer).upload_file(file_path)
+                    toolserver_if.upload_file(file_path)
                 except Exception as e:
                     self.logger.typewriter_log(
                         "Error happens when uploading file",
@@ -106,5 +108,5 @@ class XAgentServer:
             self.logger.info(traceback.format_exc())
             raise e
         finally:
-            reacttoolexecutor.get_interface_for_type(ToolType.ToolServer).download_all_files()
-            reacttoolexecutor.close()
+            toolserver_if.download_all_files()
+            toolserver_if.close()

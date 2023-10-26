@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 """
-This package is used to define the interface between XAgent engines and the tool services
-like ToolServer, BuildIn tools, RapidAPI tools, etc.
-The ToolExecutor is responsible to execute the tools and manage multiple tool interfaces.
+This module contains the interfaces for the tools. Provide a bridge
+between the real world tools with the XAgent.
 """
 
-
-from .executor import BaseToolExecutor,ReActToolExecutor, PipeToolExecutor
-from .interfaces import BaseToolInterface,ToolServerInterface,BuiltInInterface
+from .base import BaseToolInterface
+from .builtin import BuiltInInterface
+from .toolserver import ToolServerInterface
+from .rapidapi import RapidAPIInterface

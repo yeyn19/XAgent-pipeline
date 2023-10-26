@@ -9,7 +9,6 @@ from copy import deepcopy
 from command import CommandLine,XAgentServerEnv
 from XAgent.engines import PipelineV2Engine
 # from XAgent.models.pipeline_automat import PipelineAutoMat
-from XAgent.global_vars import reacttoolexecutor
 from XAgent.config import CONFIG,ARGS
 
 def parse_args():
@@ -41,7 +40,6 @@ if __name__ == '__main__':
     os.environ['CONFIG_FILE'] = "assets/private.yml"
     CONFIG.reload(config_file="assets/private.yml")
 
-    # cmd = CommandLine(XAgentServerEnv)
     if args.quiet:
         original_stdout = sys.stdout
         from XAgent.running_recorder import recorder
@@ -58,13 +56,11 @@ if __name__ == '__main__':
             else:
                 ARGS[key] = value
 
-    reacttoolexecutor.lazy_init(CONFIG)
-    reacttoolexecutor.get_available_tools()
 
-    pipeline_engine = PipelineV2Engine(CONFIG)
-    asyncio.run(pipeline_engine.run(pipeline_dir="assets/handcraft_pipelines/case1"))
-    exit()
-    
+    # pipeline_engine = PipelineV2Engine(CONFIG)
+    # asyncio.run(pipeline_engine.run(pipeline_dir="assets/handcraft_pipelines/case1"))
+    # exit()
+    cmd = CommandLine(XAgentServerEnv)
     cmd.start(
         args['task'],
         role="Assistant",

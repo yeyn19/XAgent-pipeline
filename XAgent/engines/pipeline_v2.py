@@ -4,7 +4,7 @@ import json
 from colorama import Fore, Style
 
 from XAgent.config import CONFIG
-from XAgent.tools import BaseToolExecutor, ToolServerInterface, PipeToolExecutor
+from XAgent.tools import ToolServerInterface
 from XAgent.logs import logger
 from XAgent.utils import has_route_function
 from XAgent.models import ExecutionNode,ExecutionGraph, ToolNode

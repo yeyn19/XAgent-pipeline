@@ -115,7 +115,7 @@ class ExecutionGraph(BaseModel):
             else:
                 self.begin_node = node
         else:
-            raise TypeError('node must be instance of ExecutionNode!')
+            raise TypeError(f'Unknown node type: {type(node)}，node must be instance of ExecutionNode!')
         
     def get_begin_node(self):
         return self.nodes[self.begin_node]
