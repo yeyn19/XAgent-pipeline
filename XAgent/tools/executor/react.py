@@ -11,9 +11,9 @@ class ReActToolExecutor(BaseToolExecutor):
         super().__init__(config)
 
     
-    def lazy_init(self, config=CONFIG):
+    def lazy_init(self, tool_server_interface, config=CONFIG):
         super().lazy_init(config)
         self.set_interface_for_type(
             ToolType.BuiltIn, BuiltInInterface().lazy_init(config))
         self.set_interface_for_type(
-            ToolType.ToolServer, ToolServerInterface().lazy_init(config))
+            ToolType.ToolServer, tool_server_interface)

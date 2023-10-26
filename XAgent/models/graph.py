@@ -180,7 +180,11 @@ class ExecutionGraph(BaseModel):
             node = node.node_id
         return list(self.edges.get(node,{}).keys())
     
-    
+    def get_edge_nodes(self, DirectedEdge):
+        for from_node_id in self.edges.keys():
+            for to_node_id in self.edges[from_node_id].keys():
+                if self.edges[from_node_id][to_node_id] == DirectedEdge:
+                    return self[from_node_id], self[to_node_id]
         
     def __getitem__(self, item)->Union[ExecutionNode,DirectedEdge]:
         if isinstance(item, GID):

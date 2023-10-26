@@ -1,8 +1,10 @@
 import os
 import abc
 from copy import deepcopy
-from dataclasses import dataclass
 from pydantic import BaseModel
+from enum import Enum
+from typing import List
+from dataclasses import dataclass, field
 
 from XAgent.message_history import MessageHistory
 from XAgent.enums import ToolCallStatusCode, TaskStatusCode,ToolType
@@ -18,10 +20,10 @@ class Node(metaclass = abc.ABCMeta):
 class ToolNode(BaseModel):
     """存储所有工具相关信息的数据结构
     """
-    tool_type:ToolType = ToolType.Default
-
-    expand_num:int = 0
-    data:dict = {
+    tool_type: ToolType = ToolType.Default
+    father: 'ToolNode' = None
+    expand_num: int = 0
+    data: dict = field(default_factory=lambda: {
         "content": "",
         "thoughts": {
             "properties": {
@@ -39,7 +41,8 @@ class ToolNode(BaseModel):
         },
         "tool_output": "",
         "tool_status_code": ToolCallStatusCode.TOOL_CALL_SUCCESS,
-    }
+    })
+
 
     @property
     def content(self):

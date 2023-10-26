@@ -10,28 +10,28 @@
     "nodes": [
         {
             "node_name": "start",
-            "tool_name": "start",
-            "node_type": "Control"
+            "tool_name": "Start",
+            "node_type": "Start"
         },
         {
             "node_name": "google sheet read",
             "tool_name": "googleSheets.sheet.read",
-            "node_type": "ReACT"
+            "node_type": "N8N"
         },
         {
             "node_name": "send gmail",
             "tool_name": "gmail.message.send",
-            "node_type": "ReACT"
+            "node_type": "N8N"
         },   
         {
             "node_name": "slack send message",
             "tool_name": "slack.message.post",
-            "node_type": "ReACT"
+            "node_type": "N8N"
         },
         {
             "node_name": "print_file_system",
-            "tool_name": "FileSystemEnv_read_from_file",
-            "node_type": "ReACT"
+            "tool_name": "FileSystemEnv_print_filesys_struture",
+            "node_type": "ToolServer"
         }
     ],
 

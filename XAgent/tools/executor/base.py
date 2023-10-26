@@ -54,8 +54,8 @@ class BaseToolExecutor:
         tool_node.data['tool_output'] = output
         tool_node.data['tool_status_code'] = status_code
         
-        logger.typewriter_log("Tool Return: ", Fore.YELLOW, str(output))
+        logger.typewriter_log("Tool Return: ", Fore.CYAN, str(output))
         logger.typewriter_log(
-            "TOOL STATUS CODE: ", Fore.YELLOW, f"{status_code.color()}{status_code.name}{Style.RESET_ALL}"
+            "TOOL STATUS CODE: ", Fore.CYAN, f"{status_code.color()}{status_code.name}{Style.RESET_ALL}"
         )
         return status_code,output

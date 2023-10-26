@@ -2,10 +2,10 @@ import os
 import sys
 import argparse
 import json
+import asyncio
 
-from XAgent.inner_loop_search_algorithms.pipeline_runner import run_pipeline
-from XAgent.models.pipeline_automat import PipelineAutoMat
-from XAgent.global_vars import reacttoolexecutor
+from XAgent.engines import PipelineV2Engine
+from XAgent.global_vars import reacttoolexecutor, global_tool_server_interface
 from copy import deepcopy
 from XAgent.config import CONFIG,ARGS
 from command import CommandLine,XAgentServerEnv
@@ -37,23 +37,23 @@ def parse_args():
 if __name__ == '__main__':
     # args = parse_args()
     CONFIG.reload("./assets/private.yml")
-    reacttoolexecutor.lazy_init(CONFIG)
+    global_tool_server_interface.lazy_init(CONFIG)
+    reacttoolexecutor.lazy_init(global_tool_server_interface, CONFIG)
     reacttoolexecutor.get_available_tools()
 
-
-    pipeline_dir = "./assets/handcraft_pipelines/case1"
-    file = "assets.handcraft_pipelines.case1.rule"
-    with open(os.path.join(pipeline_dir,"automat.json")) as reader:
-        pipeline_json_data = json.load(reader)
-    pipeline = PipelineAutoMat.from_json(
-        json_data=pipeline_json_data,
-        rule_file_name=file,
-    )
-    
-    import asyncio
-    asyncio.run(run_pipeline(pipeline))
-    
-    run_pipeline(pipeline)
+    engine = PipelineV2Engine(CONFIG)
+    asyncio.run(engine.run(
+        pipeline_dir="assets/handcraft_pipelines/case1"
+    ))
+    # pipeline_dir = "./assets/handcraft_pipelines/case1"
+    # file = "assets.handcraft_pipelines.case1.rule"
+    # with open(os.path.join(pipeline_dir,"automat.json")) as reader:
+    #     pipeline_json_data = json.load(reader)
+    # pipeline = PipelineAutoMat.from_json(
+    #     json_data=pipeline_json_data,
+    #     rule_file_name=file,
+    # )
+    # run_pipeline(pipeline)
     exit()
     args = parse_args()
     os.environ['CONFIG_FILE'] = args.config_file

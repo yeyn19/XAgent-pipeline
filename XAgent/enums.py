@@ -18,12 +18,6 @@ class ToolType(Enum):
     def __hash__(self):
         return hash(self.value)
 
-class ExecutionType(Enum):
-    AtomicTool = auto()
-    ReACTChain = auto()
-    AutoMatProcess = auto()
-    HumanElicitingProcess = auto()
-
 
 
 @unique
@@ -74,12 +68,6 @@ class TaskStatusCode(Enum):
     SUCCESS = 2
     FAIL = 3
     SPLIT = 4 
-
-
-@unique
-class AutoMatStateChangeHardness(Enum):
-    """描述自动机选边的困难程度，用来在运行时选择状态转移消耗的资源"""
-    GPT4 = auto()
 
 @unique
 class RequiredAbilities(Enum):
