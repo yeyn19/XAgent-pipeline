@@ -8,7 +8,7 @@ from copy import deepcopy
 
 from command import CommandLine,XAgentServerEnv
 from XAgent.engines import PipelineV2Engine
-# from XAgent.models.pipeline_automat import PipelineAutoMat
+from XAgent.models import TaskNode
 from XAgent.config import CONFIG,ARGS
 
 def parse_args():
@@ -57,9 +57,13 @@ if __name__ == '__main__':
                 ARGS[key] = value
 
 
-    # pipeline_engine = PipelineV2Engine(CONFIG)
-    # asyncio.run(pipeline_engine.run(pipeline_dir="assets/handcraft_pipelines/case1"))
-    # exit()
+    pipeline_engine = PipelineV2Engine(CONFIG)
+    pipeline_engine.lazy_init(CONFIG)
+    task = TaskNode(
+        pipeline_dir = "assets/handcraft_pipelines/case1"
+    )
+    asyncio.run(pipeline_engine.run(task))
+    exit()
     cmd = CommandLine(XAgentServerEnv)
     cmd.start(
         args['task'],

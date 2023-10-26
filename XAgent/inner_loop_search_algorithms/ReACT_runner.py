@@ -6,7 +6,7 @@ from XAgent.config import CONFIG
 from XAgent.agent.base_agent import BaseAgent
 from XAgent.agent.summarize import summarize_action,summarize_plan,clip_text,get_token_nums
 from XAgent.models import ToolNode,TaskSearchTree
-from XAgent.enums import ToolType, SearchMethodStatusCode, ToolCallStatusCode
+from XAgent.enums import ToolType, EngineExecutionStatusCode, ToolCallStatusCode
 from XAgent.logs import logger, print_assistant_thoughts
 from XAgent.message_history import Message
 from XAgent.global_vars import reacttoolexecutor
@@ -46,10 +46,10 @@ class ReACTChainSearch():
         for _attempt_id in range(max_try):
             await self.generate_chain_async(config, agent, task_handler, arguments,functions, task_id)
 
-        if self.status == SearchMethodStatusCode.HAVE_AT_LEAST_ONE_ANSWER:
-            self.status = SearchMethodStatusCode.SUCCESS
+        if self.status == EngineExecutionStatusCode.HAVE_AT_LEAST_ONE_ANSWER:
+            self.status = EngineExecutionStatusCode.SUCCESS
         else:
-            self.status = SearchMethodStatusCode.FAIL
+            self.status = EngineExecutionStatusCode.FAIL
 
     def get_finish_node(self):
         return self.finish_node
@@ -215,7 +215,7 @@ class ReACTChainSearch():
 
             if status_code == ToolCallStatusCode.SUBMIT_AS_SUCCESS:
 
-                self.status = SearchMethodStatusCode.HAVE_AT_LEAST_ONE_ANSWER
+                self.status = EngineExecutionStatusCode.HAVE_AT_LEAST_ONE_ANSWER
                 break
             elif status_code == ToolCallStatusCode.SUBMIT_AS_FAILED:
                 break

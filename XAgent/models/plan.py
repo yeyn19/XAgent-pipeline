@@ -76,3 +76,14 @@ class Plan(BaseModel):
         all_plans = Plan.get_inorder_travel(root_plan)
         order_id = all_plans.index(now_plan)
         return all_plans[order_id:]
+
+    @staticmethod
+    def get_single_subtask_plan_from_task(query: str):
+        plan = Plan()
+        plan.data = TaskSaveItem(
+            name="handle the given task",
+            goal=query,
+            milestones=[],
+            prior_plan_criticism=""
+        )
+        return plan

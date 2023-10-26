@@ -8,7 +8,7 @@ from XAgent.engines import ReActEngine
 from XAgent.logs import logger, print_task_save_items
 from XAgent.running_recorder import recorder
 from XAgent.agent.summarize import summarize_plan 
-from XAgent.enums import ToolType, SearchMethodStatusCode,TaskStatusCode
+from XAgent.enums import ToolType, EngineExecutionStatusCode,TaskStatusCode
 from XAgent.models import TaskNode
 
 from .base_query import BaseQuery
@@ -186,14 +186,14 @@ class TaskHandler():
             functions=tools_des,
             interaction=self.interaction,)
 
-        if exec_result.status == SearchMethodStatusCode.SUCCESS:
+        if exec_result.status == EngineExecutionStatusCode.SUCCESS:
             plan.data.status = TaskStatusCode.SUCCESS
             logger.typewriter_log(
                 f"-=-=-=-=-=-=-= Task {task_ids_str} ({plan.data.name}): Solved -=-=-=-=-=-=-=",
                 Fore.GREEN,
                 "",
             )
-        elif exec_result.status == SearchMethodStatusCode.FAIL:
+        elif exec_result.status == EngineExecutionStatusCode.FAIL:
             plan.data.status = TaskStatusCode.FAIL
             logger.typewriter_log(
                 f"-=-=-=-=-=-=-= Task {task_ids_str} ({plan.data.name}): Failed -=-=-=-=-=-=-=",

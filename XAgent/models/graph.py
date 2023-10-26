@@ -1,5 +1,6 @@
 import uuid
 import random
+from .plan import Plan
 from pydantic import BaseModel,Field
 from typing import Dict,Any,Optional,Union,List
 
@@ -24,7 +25,11 @@ class ExecutionNode(BaseModel):
     def __str__(self) -> str:
         return str(self.node_id)
 
-    
+class TaskNode(ExecutionNode):
+    plan:Plan = None
+    begin_node:bool = True
+    pipeline_dir: str = None
+
 class DirectedEdge(BaseModel):
     edge_id:GID  = Field(default_factory=assign_gid)
     def __eq__(self, other) -> bool:

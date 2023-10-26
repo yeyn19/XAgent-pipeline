@@ -4,10 +4,10 @@ import json
 from colorama import Fore, Style
 
 from XAgent.config import CONFIG
-from XAgent.tools import ToolServerInterface
+from XAgent.tools import ToolServerInterface, BuiltInInterface
 from XAgent.logs import logger
 from XAgent.utils import has_route_function
-from XAgent.models import ExecutionNode,ExecutionGraph, ToolNode
+from XAgent.models import ExecutionNode,ExecutionGraph, ToolNode, TaskNode, Plan, ReActExecutionGraph
 from XAgent.enums import ToolType
 from XAgent.global_vars import INTERRUPT
 from .base import BaseEngine
@@ -38,10 +38,10 @@ def ai_route_function(now_node: PipelineAutoMatNode, pipeline: PipelineAutoMat, 
 class PipelineV2Engine(BaseEngine):
     """Execute a pipeline as a automat."""
     def __init__(self, config=CONFIG):
-        self.config = config
-        self.pipe_executor =  PipeToolExecutor()
-        self.pipe_executor.lazy_init(self.config)
-    
+        super().__init__(config)
+
+        self.toolserverif = ToolServerInterface()
+        self.toolifs = [self.toolserverif]
     
     async def step(self,
                    node: PipelineAutoMatNode,
@@ -57,15 +57,27 @@ class PipelineV2Engine(BaseEngine):
                     tool_name=node.tool_name,
                     tool_args=route_result.provide_params,
                 )
-                status_code, output_data = self.pipe_executor.execute(prior_tool_node)
+                status_code, output_data = await self.execute(prior_tool_node)
                 return status_code, output_data, prior_tool_node
+            case ExecutionNodeTypeForPipelineUserInterface.ReACTChain:
+                from .react import ReActEngine
+                temp_react_engine = ReActEngine(CONFIG)
+                execute_graph: ReActExecutionGraph = await temp_react_engine.run(
+                    task= TaskNode(
+                        plan = Plan.get_single_subtask_plan_from_task(query=route_result.provide_params["query"])
+                    )
+                )
+                # execute_graph.
+
             case _:
                 logger.typewriter_log("Not implemented", Fore.RED, node.node_type.name)
                 raise NotImplementedError
     
-    async def run(self,pipeline_dir,**kwargs)->ExecutionGraph:
-        
+    async def run(self,task: TaskNode,**kwargs)->ExecutionGraph:
+        out_names, out_json = await self.get_available_tools()
+
         """传入pipeline文件，执行pipeline"""
+        pipeline_dir = task.pipeline_dir
         file = pipeline_dir.replace("/",".") + ".rule"
         with open(os.path.join(pipeline_dir,"automat.json")) as reader:
             pipeline_json_data = json.load(reader)

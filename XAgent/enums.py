@@ -55,7 +55,7 @@ class PlanOperationStatusCode(Enum):
     OTHER_ERROR = 5
 
 @unique
-class SearchMethodStatusCode(Enum):
+class EngineExecutionStatusCode(Enum):
     DOING = 0
     SUCCESS = 1
     FAIL = 2

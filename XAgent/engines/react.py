@@ -8,7 +8,7 @@ from XAgent.ai_functions import function_manager
 from XAgent.tools import ToolServerInterface,BuiltInInterface
 
 from XAgent.models import ToolExecutionNode,ReActExecutionGraph
-from XAgent.enums import RequiredAbilities,SearchMethodStatusCode,ToolCallStatusCode
+from XAgent.enums import RequiredAbilities,EngineExecutionStatusCode,ToolCallStatusCode
 from XAgent.message_history import Message
 
 from .base import BaseEngine,TaskNode
@@ -140,9 +140,9 @@ class ReActEngine(BaseEngine):
             node = nnode
         
         if node.status_code == ToolCallStatusCode.SUBMIT_AS_SUCCESS:
-            execution_track.status = SearchMethodStatusCode.SUCCESS
+            execution_track.status = EngineExecutionStatusCode.SUCCESS
         else:
-            execution_track.status = SearchMethodStatusCode.FAIL
+            execution_track.status = EngineExecutionStatusCode.FAIL
 
         execution_track.set_end_node(node)
                 
