@@ -6,8 +6,8 @@ import json
 from copy import deepcopy
 
 from command import CommandLine,XAgentServerEnv
-from XAgent.inner_loop_search_algorithms.pipeline_runner import run_pipeline
-from XAgent.models.pipeline_automat import PipelineAutoMat
+# from XAgent.inner_loop_search_algorithms.pipeline_runner import run_pipeline
+# from XAgent.models.pipeline_automat import PipelineAutoMat
 from XAgent.global_vars import reacttoolexecutor
 from XAgent.config import CONFIG,ARGS
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     args = parse_args()
     os.environ['CONFIG_FILE'] = "assets/private.yml"
 
-    # cmd = CommandLine(XAgentServerEnv)
+    cmd = CommandLine(XAgentServerEnv)
     if args.quiet:
         original_stdout = sys.stdout
         from XAgent.running_recorder import recorder
@@ -64,23 +64,23 @@ if __name__ == '__main__':
     file = "assets.handcraft_pipelines.case1.rule"
     with open(os.path.join(pipeline_dir,"automat.json")) as reader:
         pipeline_json_data = json.load(reader)
-    pipeline = PipelineAutoMat.from_json(
-        json_data=pipeline_json_data,
-        rule_file_name=file,
-    )
-    
-    import asyncio
-    asyncio.run(run_pipeline(pipeline))
-    
-    run_pipeline(pipeline)
-    exit()
-    
-    # cmd.start(
-    #     args['task'],
-    #     role="Assistant",
-    #     mode=args['mode'],
-    #     upload_files=args['upload_files'],
+    # pipeline = PipelineAutoMat.from_json(
+    #     json_data=pipeline_json_data,
+    #     rule_file_name=file,
     # )
+    
+    # import asyncio
+    # asyncio.run(run_pipeline(pipeline))
+    
+    # run_pipeline(pipeline)
+    # exit()
+    
+    cmd.start(
+        args['task'],
+        role="Assistant",
+        mode=args['mode'],
+        upload_files=args['upload_files'],
+    )
     if args.quiet:
         sys.stdout.close()
         sys.stdout = original_stdout
