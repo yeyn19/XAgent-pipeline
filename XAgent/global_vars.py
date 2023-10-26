@@ -1,8 +1,13 @@
 # from XAgent.workflow.working_memory import WorkingMemoryAgent
-from XAgent.agent.dispatcher import agent_dispatcher
 #from XAgent.vector_db import VectorDBInterface
 # from XAgent.running_recorder import RunningRecoder
 from XAgent.config import CONFIG as __config
+from XAgent.agent import agent_dispatcher,PlanGenerateAgent, PlanRefineAgent,ReflectAgent, ToolAgent
+
+for agent in [PlanGenerateAgent,PlanRefineAgent,ToolAgent,ReflectAgent,]:
+    agent_dispatcher.regist_agent(agent)
+
+
 
 INTERRUPT = False
 INTERRUPT_MESSAGE = None

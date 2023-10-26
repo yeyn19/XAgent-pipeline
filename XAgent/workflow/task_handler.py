@@ -104,10 +104,10 @@ class TaskHandler():
                     self.now_dealing_task, receive_data)
             search_method = await self.inner_loop_async(self.now_dealing_task)
 
-            self.now_dealing_task.actions = list(map(lambda x:x.tool_node,search_method.get_execution_track())) 
+            self.now_dealing_task.actions = list(map(lambda x:x.tool_call.to_json(),search_method.get_execution_track()))
             self.posterior_process(self.now_dealing_task)
 
-            working_memory_agent.register_task(self.now_dealing_task)
+            # working_memory_agent.register_task(self.now_dealing_task)
 
             
             refinement_result = {

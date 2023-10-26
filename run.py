@@ -57,13 +57,13 @@ if __name__ == '__main__':
                 ARGS[key] = value
 
 
-    pipeline_engine = PipelineV2Engine(CONFIG)
-    pipeline_engine.lazy_init(CONFIG)
-    task = TaskNode(
-        pipeline_dir = "assets/handcraft_pipelines/case1"
-    )
-    asyncio.run(pipeline_engine.run(task))
-    exit()
+    # pipeline_engine = PipelineV2Engine(CONFIG)
+    # pipeline_engine.lazy_init(CONFIG)
+    # task = TaskNode(
+    #     pipeline_dir = "assets/handcraft_pipelines/case1"
+    # )
+    # asyncio.run(pipeline_engine.run(task))
+    # exit()
     cmd = CommandLine(XAgentServerEnv)
     cmd.start(
         args['task'],

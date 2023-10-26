@@ -8,6 +8,7 @@ class Plan(BaseModel):
     children: List['Plan'] = []
     data: TaskSaveItem
     process_node: ToolNode = None 
+    actions:list = None
 
     
     def to_json(self, posterior=True):

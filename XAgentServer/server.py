@@ -20,15 +20,10 @@ class XAgentServer:
 
     async def interact(self, interaction: XAgentInteraction):
         # query = message
-        from XAgent.agent import (PlanGenerateAgent, PlanRefineAgent,
-                                  ReflectAgent, ToolAgent)
+        
         from XAgent.config import CONFIG as config
-        from XAgent.global_vars import agent_dispatcher
         from XAgent.running_recorder import recorder
         from XAgent.tools import ToolServerInterface
-        # from XAgent.tool_call_handle import (function_handler,
-        #                                      toolserver_interface)
-        from XAgent.enums import ToolType
         from XAgent.workflow.base_query import AutoGPTQuery
         from XAgent.workflow.task_handler import TaskHandler
         from XAgent.workflow.working_memory import WorkingMemoryAgent
@@ -72,14 +67,6 @@ class XAgentServer:
 
         all_functions = subtask_functions + working_memory_function
 
-        avaliable_agents = [
-            PlanGenerateAgent,
-            PlanRefineAgent,
-            ToolAgent,
-            ReflectAgent,
-        ]
-        for agent in avaliable_agents:
-            agent_dispatcher.regist_agent(agent)
 
         upload_files = args.get("file_list", [])
         if upload_files is not None:
