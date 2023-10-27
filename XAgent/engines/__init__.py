@@ -7,3 +7,4 @@ and roles of the nodes.
 from .base import BaseEngine
 from .react import ReActEngine
 from .pipeline_v2 import PipelineV2Engine
+from .plan import PlanEngine

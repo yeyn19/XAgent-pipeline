@@ -17,11 +17,11 @@ class Node(metaclass = abc.ABCMeta):
         
 
 
-class ToolNode(BaseModel):
+class ToolCall(BaseModel):
     """存储所有工具相关信息的数据结构
     """
     tool_type: ToolType = ToolType.Default
-    father: 'ToolNode' = None
+    father: 'ToolCall' = None
     expand_num: int = 0
     data: dict = field(default_factory=lambda: {
         "content": "",
@@ -82,6 +82,15 @@ class ToolNode(BaseModel):
         if self.data["command"]["properties"]["args"] == "":
             return None
         return self.data["command"]["properties"]["args"]
+
+    @property
+    def tool_output(self):
+        if self.data["tool_output"] == "":
+            return None
+        return self.data["tool_output"]
+    @property
+    def status(self):
+        return self.data["tool_status_code"]
 
     def set_tool(self,tool_name,tool_args):
         self.data["command"]["properties"]["name"] = tool_name

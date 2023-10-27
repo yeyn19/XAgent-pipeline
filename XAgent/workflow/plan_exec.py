@@ -10,7 +10,7 @@ from XAgent.workflow.base_query import BaseQuery
 from XAgent.global_vars import agent_dispatcher
 from XAgent.utils import TaskSaveItem
 from XAgent.message_history import Message
-from XAgent.models import Plan,ToolNode
+from XAgent.models import Plan,ToolCall
 from XAgent.enums import ToolType,TaskStatusCode,RequiredAbilities,PlanOperationStatusCode
 from XAgent.tools import ToolServerInterface
 from XAgent.ai_functions import  function_manager

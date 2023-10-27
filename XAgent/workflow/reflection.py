@@ -4,13 +4,13 @@ from typing import List
 from copy import deepcopy
 
 from XAgent.enums import RequiredAbilities
-from XAgent.models import ToolNode
+from XAgent.models import ToolCall
 from XAgent.workflow.plan_exec import Plan
 from XAgent.global_vars import agent_dispatcher
 from XAgent.agent.summarize import summarize_action,summarize_plan
 from XAgent.ai_functions import function_manager
 
-def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, actions: list[ToolNode], tool_functions_description_list: List[dict], config):
+def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, actions: list[ToolCall], tool_functions_description_list: List[dict], config):
 
     agent = agent_dispatcher.dispatch(
         RequiredAbilities.reflection,

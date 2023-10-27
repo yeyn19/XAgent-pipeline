@@ -12,7 +12,7 @@ import types
 from XAgent.enums import  ToolCallStatusCode
 from XAgent.logs import logger
 from XAgent.models.graph import ExecutionGraph, ExecutionNode, DirectedEdge
-from XAgent.models.node import ToolNode
+from XAgent.models.node import ToolCall
 
 
 @unique
@@ -55,7 +55,7 @@ class PipelineRouteResult():
 class PipelineRuntimeNode():
     route_result: PipelineRouteResult
     route_type: PipelineRouteType
-    tool_node: ToolNode
+    tool_node: ToolCall
 
 @dataclass
 class PipelineRuntimeStackUserInterface():

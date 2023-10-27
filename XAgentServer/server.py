@@ -25,8 +25,9 @@ class XAgentServer:
         from XAgent.running_recorder import recorder
         from XAgent.tools import ToolServerInterface
         from XAgent.workflow.base_query import AutoGPTQuery
-        from XAgent.workflow.task_handler import TaskHandler
-        from XAgent.workflow.working_memory import WorkingMemoryAgent
+        from XAgent.engines import PlanEngine,ReActEngine
+        from XAgent.models import PlanExecutionNode
+        # from XAgent.workflow.working_memory import WorkingMemoryAgent
         config.reload()
         # args
         args = interaction.parameter.args
@@ -61,11 +62,11 @@ class XAgentServer:
         toolserver_if.lazy_init(config)
 
         # working memory function is used for communication between different agents that handle different subtasks
-        working_memory_function = WorkingMemoryAgent.get_working_memory_function()
+        # working_memory_function = WorkingMemoryAgent.get_working_memory_function()
         
-        subtask_functions, tool_functions_description_list = toolserver_if.get_available_tools()
+        # subtask_functions, tool_functions_description_list = toolserver_if.get_available_tools()
 
-        all_functions = subtask_functions + working_memory_function
+        # all_functions = subtask_functions + working_memory_function
 
 
         upload_files = args.get("file_list", [])
@@ -81,16 +82,18 @@ class XAgentServer:
                         f"{file_path}\n{e}",
                     )
 
-        task_handler = TaskHandler(
-            config=config,
-            query=query,
-            interaction=interaction,
-            function_list=all_functions,
-            tool_functions_description_list=tool_functions_description_list,
+        inital_node = PlanExecutionNode(
+            role=args.get('role_name', 'Assistant'),
+            task=args.get('goal', ''),
         )
+        plan_engine = PlanEngine(config=config)
+        execution_engine = ReActEngine(config=config)        
+        
         try:
             self.logger.info(f"Start outer loop async")
-            await task_handler.outer_loop_async()
+            await plan_engine.run(inital_node,
+                                  execution_engine=execution_engine,
+                                  interaction=interaction)
         except Exception as e:
             self.logger.info(traceback.format_exc())
             raise e

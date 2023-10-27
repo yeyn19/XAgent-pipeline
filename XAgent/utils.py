@@ -51,7 +51,6 @@ class TaskSaveItem:
     posterior_plan_reflection: List[str] = field(default_factory=lambda: [])
     tool_reflection: List[Dict[str,str]] = field(default_factory=lambda: [])
 
-
     def load_from_json(self, function_output_item):
         if "subtask name" in function_output_item.keys():
             self.name = function_output_item["subtask name"]
@@ -82,6 +81,7 @@ class TaskSaveItem:
             self.milestones = function_output_item["milestones"]
         # if "expected_tools" in function_output_item.keys():
         #     self.expected_tools = function_output_item["expected_tools"]
+        return self
 
     def to_json(self, posterior=False):
         json_data = {
@@ -105,7 +105,7 @@ class TaskSaveItem:
 
     @property
     def raw(self) -> str:
-        return json.dumps(self.to_json(posterior=True), indent=2, ensure_ascii=False)
+        return json.dumps(self.to_json(posterior=True), indent=0, ensure_ascii=False)
 
 
 

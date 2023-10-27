@@ -1,8 +1,11 @@
 import uuid
 import random
-from .plan import Plan
 from pydantic import BaseModel,Field
 from typing import Dict,Any,Optional,Union,List
+
+from XAgent.enums import EngineExecutionStatusCode
+from .plan import Plan
+from .node import ToolCall
 
 GID = str
 
@@ -13,6 +16,7 @@ class ExecutionNode(BaseModel):
     node_id:GID = Field(default_factory=assign_gid)
     in_degree:int = 0
     out_degree:int = 0
+    tool_call:ToolCall = None
     
     begin_node:bool = False
     end_node:bool = False
@@ -45,7 +49,8 @@ class ExecutionGraph(BaseModel):
     end_node:Optional[GID] = None
     nodes:Dict[GID,ExecutionNode] = {}
     edges:Dict[GID,Dict[GID,DirectedEdge]] = {}
-    
+    status:EngineExecutionStatusCode = EngineExecutionStatusCode.DOING
+
     def convert_to_dict(self):
         data = []
         all_start_nodes = [node.node_id for node in self.nodes.values() if node.in_degree == 0]

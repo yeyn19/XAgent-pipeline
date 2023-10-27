@@ -9,7 +9,7 @@ from XAgent.agent.base_agent import BaseAgent
 from XAgent.enums import RequiredAbilities
 from XAgent.message_history import Message
 from XAgent.logs import logger
-from XAgent.models import ToolNode
+from XAgent.models import ToolCall
 from XAgent.ai_functions import function_manager,objgenerator
 from XAgent.config import CONFIG
 
@@ -103,7 +103,7 @@ class ToolAgent(BaseAgent):
                 
         return message,tokens
     
-    def message_to_tool_node(self,message) -> ToolNode:
+    def message_to_toolcall(self,message) -> ToolCall:
         # assume message format
         # {
         #   "content": "The content is useless",
@@ -117,16 +117,16 @@ class ToolAgent(BaseAgent):
         #  },
         # }
         
-        new_node = ToolNode()
+        toolcall = ToolCall()
         if "content" in message.keys():
             print(message["content"])
-            new_node.data["content"] = message["content"]
+            toolcall.data["content"] = message["content"]
         if 'arguments' in message.keys():
-            new_node.data['thoughts']['properties'] = message["arguments"]
+            toolcall.data['thoughts']['properties'] = message["arguments"]
         if "function_call" in message.keys():
-            new_node.data["command"]["properties"]["name"] = message["function_call"]["name"]
-            new_node.data["command"]["properties"]["args"] = message["function_call"]["arguments"]
+            toolcall.data["command"]["properties"]["name"] = message["function_call"]["name"]
+            toolcall.data["command"]["properties"]["args"] = message["function_call"]["arguments"]
         else:
-            logger.typewriter_log("message_to_tool_node warning: no function_call in message",Fore.RED)
+            logger.typewriter_log("message_to_toolcall warning: no function_call in message",Fore.RED)
 
-        return new_node
+        return toolcall

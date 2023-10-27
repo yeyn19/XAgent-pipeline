@@ -38,12 +38,7 @@ if __name__ == '__main__':
     args = parse_args()
     # CONFIG.reload(config_file="assets/private.yml")
     os.environ['CONFIG_FILE'] = "assets/private.yml"
-    CONFIG.reload(config_file="assets/private.yml")
-
-    
-    
-    args = vars(args)
-    
+    args = vars(args)    
     for key,value in args.items():
         if value is not None:
             if key == 'model':
@@ -52,6 +47,7 @@ if __name__ == '__main__':
             else:
                 ARGS[key] = value
 
+    CONFIG.reload(config_file="assets/private.yml")
 
     # pipeline_engine = PipelineV2Engine(CONFIG)
     # pipeline_engine.lazy_init(CONFIG)

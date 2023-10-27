@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from XAgent.utils import TaskSaveItem, TaskStatusCode
-from XAgent.models import ToolNode
+from XAgent.models import ToolCall
 
 class Plan(BaseModel):
     father: Optional['Plan'] = None
     children: List['Plan'] = []
     data: TaskSaveItem
-    process_node: ToolNode = None 
+    process_node: ToolCall = None 
     actions:list = None
 
     
@@ -38,8 +38,8 @@ class Plan(BaseModel):
         fahter_subtask_id.append(child_id)
         return fahter_subtask_id
     
-    @classmethod
-    def make_relation(cls, father, child):
+    @staticmethod
+    def make_relation(father, child):
         father.children.append(child)
         child.father = father
 
@@ -53,15 +53,15 @@ class Plan(BaseModel):
             return 1
         return 1 + self.father.get_depth()
 
-    @classmethod
-    def get_inorder_travel(cls, now_plan):
+    @staticmethod
+    def get_inorder_travel(now_plan:'Plan'):
         result_list = [now_plan]
         for child in now_plan.children:
-            result_list.extend(Plan.get_inorder_travel(child))
+            result_list.extend(now_plan.get_inorder_travel(child))
         return result_list
 
-    @classmethod
-    def pop_next_subtask(cls, now_plan):
+    @staticmethod
+    def pop_next_subtask(now_plan):
 
         root_plan = now_plan.get_root()
         all_plans = Plan.get_inorder_travel(root_plan)
@@ -71,8 +71,8 @@ class Plan(BaseModel):
                 return subtask
         return None
 
-    @classmethod
-    def get_remaining_subtask(cls, now_plan):
+    @staticmethod
+    def get_remaining_subtask(now_plan):
         root_plan = now_plan.get_root()
         all_plans = Plan.get_inorder_travel(root_plan)
         order_id = all_plans.index(now_plan)

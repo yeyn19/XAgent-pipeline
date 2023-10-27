@@ -1,9 +1,9 @@
-from XAgent.models import ToolNode
+from XAgent.models import ToolCall
 
 
 class TaskSearchTree:
     def __init__(self):
-        self.root: ToolNode = ToolNode()
+        self.root: ToolCall = ToolCall()
         self.root.expand_num = 0
         self.now_expand_num = 1
 

@@ -1,3 +1,4 @@
+import traceback
 from colorama import Fore
 from XAgent.config import CONFIG
 
@@ -41,11 +42,7 @@ class ReActEngine(BaseEngine):
         )
         
         if interrupt:
-            logger.typewriter_log(
-                "INTERRUPTED",
-                Fore.RED,
-                "",
-            )
+            logger.typewriter_log("-=-=-=-=-=-=-= INTERRUPTED -=-=-=-=-=-=-=",Fore.RED,)
             from XAgent.global_vars import INTERRUPT_MESSAGE
             # TODO: add interrupt message
             # message:str = await INTERRUPT_MESSAGE.get()
@@ -93,7 +90,7 @@ class ReActEngine(BaseEngine):
         )
         
         
-        exec_node = ReActExecutionNode(tool_call=self.agent.message_to_tool_node(message))
+        exec_node = ReActExecutionNode(tool_call=self.agent.message_to_toolcall(message))
         
         thoughts = print_assistant_thoughts(exec_node.tool_call.data, False)
 
@@ -103,29 +100,31 @@ class ReActEngine(BaseEngine):
         if exec_node.tool_call.tool_name == finish_tool_call:
             exec_node.end_node = True
         
-        # transmit infomations
-        await kwargs['interaction'].update_cache(update_data={**thoughts, "using_tools": {
-            "tool_name": exec_node.tool_call.tool_name,
-            "tool_input": exec_node.tool_call.tool_args,
-            "tool_output": tool_output,
-            "tool_status_code": status_code.name,
-            "thought_data": {
-                "thought": exec_node.tool_call.thought, 
-                "content": exec_node.tool_call.content
-            }
-        }}, status="inner", current=task_id)
-
+        try:
+            # transmit infomations
+            await kwargs['interaction'].update_cache(update_data={**thoughts, "using_tools": {
+                "tool_name": exec_node.tool_call.tool_name,
+                "tool_input": exec_node.tool_call.tool_args,
+                "tool_output": tool_output,
+                "tool_status_code": status_code.name,
+                "thought_data": {
+                    "thought": exec_node.tool_call.thought, 
+                    "content": exec_node.tool_call.content
+                }
+            }}, status="inner", current=task_id)
+        except:
+            traceback.print_exc()
+            
         return exec_node
         
         
         
     async def run(self,task:TaskNode,**kwargs)->ReActExecutionGraph:
         """Execute the engine and return the result node."""
+        await self.lazy_init(self.config)
         execution_track = ReActExecutionGraph()
         execution_track.set_begin_node(task)
-        
-        await self.get_available_tools()
-        
+                
         node = task
         while not node.end_node:
             nnode = await self.step(
@@ -139,11 +138,11 @@ class ReActEngine(BaseEngine):
             execution_track.add_edge(node,nnode)
             node = nnode
         
-        if node.status_code == ToolCallStatusCode.SUBMIT_AS_SUCCESS:
-            execution_track.status = EngineExecutionStatusCode.SUCCESS
-        else:
-            execution_track.status = EngineExecutionStatusCode.FAIL
+        execution_track.status = EngineExecutionStatusCode.SUCCESS if node.status_code == ToolCallStatusCode.SUBMIT_AS_SUCCESS else EngineExecutionStatusCode.FAIL
 
-        execution_track.set_end_node(node)
-                
+        execution_track.set_end_node(node) 
+        try:
+            execution_track.need_for_plan_refine = node.tool_call.tool_args['suggestions_for_latter_subtasks_plan']['need_for_plan_refine']
+        except:
+            traceback.print_exc()
         return execution_track

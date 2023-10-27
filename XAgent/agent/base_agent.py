@@ -55,6 +55,10 @@ class BaseAgent(metaclass=abc.ABCMeta):
                  function_call:dict=None,
                  stop:dict=None,
                  *args,**kwargs):
+        arguments = deepcopy(arguments)
+        functions = deepcopy(functions)
+        function_call = deepcopy(function_call)
+        
         if isinstance(messages[0],Message):
             messages = [message.raw() for message in messages]
         if functions is not None and len(functions) == 1 and function_call is None:

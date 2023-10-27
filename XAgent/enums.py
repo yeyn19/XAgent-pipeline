@@ -47,33 +47,60 @@ class ToolCallStatusCode(Enum):
                 return Fore.RED
 @unique
 class PlanOperationStatusCode(Enum):
-    MODIFY_SUCCESS = 0
-    MODIFY_FORMER_PLAN = 1
-    PLAN_OPERATION_NOT_FOUND = 2
-    TARGET_SUBTASK_NOT_FOUND = 3
-    PLAN_REFINE_EXIT = 4
-    OTHER_ERROR = 5
-
+    MODIFY_SUCCESS = 'MODIFY_SUCCESS'
+    MODIFY_FORMER_PLAN = 'MODIFY_FORMER_PLAN'
+    PLAN_OPERATION_NOT_FOUND = 'PLAN_OPERATION_NOT_FOUND'
+    TARGET_SUBTASK_NOT_FOUND = 'TARGET_SUBTASK_NOT_FOUND'
+    PLAN_REFINE_EXIT = 'PLAN_REFINE_EXIT'
+    OTHER_ERROR = 'OTHER_ERROR'
+    def color(self):
+        match self.name:
+            case "MODIFY_SUCCESS":
+                return Fore.GREEN
+            case "MODIFY_FORMER_PLAN":
+                return Fore.RED
+            case "PLAN_OPERATION_NOT_FOUND":
+                return Fore.RED
+            case "TARGET_SUBTASK_NOT_FOUND":
+                return Fore.RED
+            case "PLAN_REFINE_EXIT":
+                return Fore.BLUE
+            case _:
+                return Fore.RED
+    
 @unique
 class EngineExecutionStatusCode(Enum):
-    DOING = 0
-    SUCCESS = 1
-    FAIL = 2
-    HAVE_AT_LEAST_ONE_ANSWER = 3 
+    DOING = 'DOING'
+    SUCCESS = 'SUCCESS'
+    FAIL = 'FAIL'
+    HAVE_AT_LEAST_ONE_ANSWER = 'HAVE_AT_LEAST_ONE_ANSWER'
 
 @unique
 class TaskStatusCode(Enum):
-    TODO = 0
-    DOING = 1
-    SUCCESS = 2
-    FAIL = 3
-    SPLIT = 4 
+    TODO = 'TODO'
+    DOING = 'DOING'
+    SUCCESS = 'SUCCESS'
+    FAIL = 'FAIL'
+    SPLIT = 'SPLIT'
+    
+    def color(self):
+        match self.name:
+            case "SUCCESS":
+                return Fore.GREEN
+            case "FAIL":
+                return Fore.RED
+            case "DOING":
+                return Fore.BLUE
+            case "SPLIT":
+                return Fore.YELLOW
+            case _:
+                return Fore.WHITE
 
 @unique
 class RequiredAbilities(Enum):
-    tool_tree_search = 0
-    plan_generation = 1
-    plan_refinement = 2
-    task_evaluator = 3
-    summarization = 4
-    reflection = 5
+    tool_tree_search = 'tool_tree_search'
+    plan_generation = 'plan_generation'
+    plan_refinement = 'plan_refinement'
+    task_evaluator = 'task_evaluator'
+    summarization = 'summarization'
+    reflection = 'reflection'

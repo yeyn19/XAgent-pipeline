@@ -5,14 +5,14 @@ from colorama import Fore
 from XAgent.config import CONFIG
 from XAgent.agent.base_agent import BaseAgent
 from XAgent.agent.summarize import summarize_action,summarize_plan,clip_text,get_token_nums
-from XAgent.models import ToolNode,TaskSearchTree
+from XAgent.models import ToolCall,TaskSearchTree
 from XAgent.enums import ToolType, EngineExecutionStatusCode, ToolCallStatusCode
 from XAgent.logs import logger, print_assistant_thoughts
 from XAgent.message_history import Message
 from XAgent.global_vars import reacttoolexecutor
 
 
-def make_message(now_node: ToolNode, task_handler, max_length, config):
+def make_message(now_node: ToolCall, task_handler, max_length, config):
     if CONFIG.enable_summary:
         terminal_task_info = summarize_plan(
             task_handler.now_dealing_task.to_json())
@@ -186,7 +186,7 @@ class ReACTChainSearch():
                 additional_messages=message_sequence,
                 additional_insert_index=-1
             )
-            new_tree_node:ToolNode = agent.message_to_tool_node(new_message)
+            new_tree_node:ToolCall = agent.message_to_toolcall(new_message)
 
             print_data = print_assistant_thoughts(
                 new_tree_node.data, False

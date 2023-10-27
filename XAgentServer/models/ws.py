@@ -5,14 +5,14 @@ import uuid
 from XAgentServer.models.subtask import Subtask
 
 class XAgentOutputData(metaclass=abc.ABCMeta):
-    def __init__(self, task_id: str,
-                 name: str,
-                 goal: str,
-                 handler: str,
-                 tool_budget: int,
-                 tool_recommendation: str,
-                 subtasks: None,
-                 node_id: str = None):
+    def __init__(self, task_id: str='',
+                 name: str='',
+                 goal: str='',
+                 handler: str='',
+                 tool_budget: int=0,
+                 tool_recommendation: str='',
+                 subtasks:list = [],
+                 node_id: str = ''):
         if subtasks is None:
             subtasks = []
         self.name = name

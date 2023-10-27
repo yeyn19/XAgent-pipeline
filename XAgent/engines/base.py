@@ -3,7 +3,7 @@ from colorama import Fore,Style
 
 from XAgent.logs import logger
 from XAgent.config import CONFIG
-from XAgent.models import ExecutionNode,ExecutionGraph,ToolNode,TaskNode
+from XAgent.models import ExecutionNode,ExecutionGraph,ToolCall,TaskNode
 from XAgent.enums import ToolCallStatusCode
 from XAgent.tools import BaseToolInterface
 
@@ -17,10 +17,10 @@ class BaseEngine:
         self.available_tools:list[str] = []
         self.tools_schema:list[dict] = []
         
-    def lazy_init(self,config):
-        self.config = config
-        for interface in self.toolifs:
-            interface.lazy_init(config)
+    async def lazy_init(self,config=None):
+        if config is not None:
+            self.config = config        
+        await self.get_available_tools()
         
     async def get_available_tools(self)->Tuple[list[str],list[dict]]:
         self.available_tools = []
@@ -28,6 +28,7 @@ class BaseEngine:
         self.toolif_mapping = {}
         
         for interface in self.toolifs:
+            interface.lazy_init(self.config)
             tools,tools_json = interface.get_available_tools()
             self.available_tools.extend(tools)
             self.tools_schema.extend(tools_json)
@@ -35,7 +36,7 @@ class BaseEngine:
                 self.toolif_mapping[tool] = interface
         return self.available_tools,self.tools_schema
                 
-    async def execute(self,tool_call:ToolNode)->Tuple[ToolCallStatusCode,Any]:
+    async def execute(self,tool_call:ToolCall)->Tuple[ToolCallStatusCode,Any]:
         """Execute a tool call."""
         logger.typewriter_log(
             "NEXT ACTION: ",
@@ -58,9 +59,7 @@ class BaseEngine:
         
     
     async def step(self,
-                   task:TaskNode,
                    *,
-                   plans:dict=None,
                    force_stop:bool=False,
                    interrupt:bool=False,
                    **kwargs)->ExecutionNode:
@@ -69,6 +68,7 @@ class BaseEngine:
     
     async def run(self,task:TaskNode,**kwargs)->ExecutionGraph:
         """Execute the engine and return the result node."""
+        await self.lazy_init(self.config)
         raise NotImplementedError
         
         

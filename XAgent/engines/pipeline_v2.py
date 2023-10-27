@@ -7,7 +7,7 @@ from XAgent.config import CONFIG
 from XAgent.tools import ToolServerInterface, BuiltInInterface
 from XAgent.logs import logger
 from XAgent.utils import has_route_function
-from XAgent.models import ExecutionNode,ExecutionGraph, ToolNode, TaskNode, Plan, ReActExecutionGraph
+from XAgent.models import ExecutionNode,ExecutionGraph, ToolCall, TaskNode, Plan, ReActExecutionGraph
 from XAgent.enums import ToolType
 from XAgent.global_vars import INTERRUPT
 from .base import BaseEngine
@@ -52,7 +52,7 @@ class PipelineV2Engine(BaseEngine):
         match node.node_type:
 
             case ExecutionNodeTypeForPipelineUserInterface.ToolServer:
-                prior_tool_node = ToolNode()
+                prior_tool_node = ToolCall()
                 prior_tool_node.set_tool(
                     tool_name=node.tool_name,
                     tool_args=route_result.provide_params,

@@ -1,16 +1,22 @@
-from XAgent.enums import ToolCallStatusCode,EngineExecutionStatusCode
+from XAgent.enums import ToolCallStatusCode,TaskStatusCode
 
-from .node import ToolNode
+from .node import ToolCall
 from .plan import Plan
-from .graph import ExecutionGraph,ExecutionNode
+from .graph import ExecutionGraph,ExecutionNode,TaskNode
 
 
 
 class ReActExecutionNode(ExecutionNode):
-    tool_call:ToolNode = None
     status_code:ToolCallStatusCode = ToolCallStatusCode.OTHER_ERROR
     
-    
 class ReActExecutionGraph(ExecutionGraph):
-    status:EngineExecutionStatusCode = EngineExecutionStatusCode.DOING
     need_for_plan_refine:bool = False
+    
+class PlanExecutionNode(TaskNode):
+    role:str = None
+    task:str = None
+    actions:list[ToolCall] = None
+    status_code: TaskStatusCode = TaskStatusCode.TODO
+    
+class PlanExecutionGraph(ExecutionGraph):
+    pass
