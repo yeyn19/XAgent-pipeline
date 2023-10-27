@@ -230,49 +230,71 @@ class PlanEngine(BaseEngine):
         target_task_id = str(tool_call.tool_args['target_subtask_id']).strip()
         current_task_id = current_task.get_subtask_id(to_str=True)
         
-        if target_task_id < current_task_id:
-            return PlanOperationStatusCode.MODIFY_FORMER_PLAN,f"Cannot modify the task {target_task_id} which is before the current task {current_task_id}. Nothing happens."
+        tool_call.status,tool_call.tool_output = PlanOperationStatusCode.OTHER_ERROR,'Unknown error'
         
+        if target_task_id < current_task_id:
+            tool_call.tool_output = f"Cannot modify the task {target_task_id} which is before the current task {current_task_id}. Nothing happens." 
+            tool_call.status = PlanOperationStatusCode.MODIFY_FORMER_PLAN
+              
+            return tool_call.status,tool_call.tool_output   
         try:
             target_task = tasks_inorder[tasks_ids.index(target_task_id)]
         except ValueError:
-            return PlanOperationStatusCode.TARGET_SUBTASK_NOT_FOUND,f"Cannot find the task {target_task_id}. Nothing happens."
+            tool_call.status = PlanOperationStatusCode.TARGET_SUBTASK_NOT_FOUND
+            tool_call.tool_output = f"Cannot find the task {target_task_id}. Nothing happens."
+            
+            return tool_call.status,tool_call.tool_output   
          
         match tool_call.tool_args['operation']:
             case 'split':
                 if target_task.get_depth() >= self.config.max_plan_tree_depth:
-                    return PlanOperationStatusCode.OTHER_ERROR, f"Cannot split the task {target_task_id} which is too deep. Nothing happens."
+                    tool_call.status = PlanOperationStatusCode.OTHER_ERROR
+                    tool_call.tool_output = f"Cannot split the task {target_task_id} which is too deep. Nothing happens."
+                    return tool_call.status,tool_call.tool_output   
                 target_task.children = [Plan(father=target_task,data=TaskSaveItem().load_from_json(newtask)) for newtask in tool_call.tool_args['subtasks']]
 
                 target_task.data.status = TaskStatusCode.SPLIT
-                return PlanOperationStatusCode.MODIFY_SUCCESS,f"Split the task {target_task_id} successfully."
+                tool_call.status = PlanOperationStatusCode.MODIFY_SUCCESS
+                tool_call.tool_output = f"Split the task {target_task_id} successfully."
+                
+                return tool_call.status,tool_call.tool_output   
 
             case 'add':
                 if target_task.get_depth() <= 1:
-                    return PlanOperationStatusCode.OTHER_ERROR, f"Cannot add a task to the task {target_task_id} which is too shallow. Nothing happens."
+                    tool_call.status = PlanOperationStatusCode.OTHER_ERROR
+                    tool_call.tool_output = f"Cannot add a task to the task {target_task_id} which is too shallow. Nothing happens."
+                    
+                    return tool_call.status,tool_call.tool_output
                 if len(target_task.father.children) + len(tool_call.tool_args['subtasks']) > self.config.max_plan_tree_width:
-                    return PlanOperationStatusCode.OTHER_ERROR, f"Cannot add a task to the task {target_task_id} which is too wide. Nothing happens."
+                    tool_call.status = PlanOperationStatusCode.OTHER_ERROR
+                    tool_call.tool_output = f"Cannot add a task to the task {target_task_id} which is too wide. Nothing happens."
+                    
+                    return tool_call.status,tool_call.tool_output
                 newtasks = [Plan(father=target_task.father,data=TaskSaveItem().load_from_json(newtask)) for newtask in tool_call.tool_args['subtasks']]
                 index_of_target_task = target_task.father.children.index(target_task)
                 target_task.father.children = target_task.father.children[:index_of_target_task+1] + newtasks + target_task.father.children[index_of_target_task+1:]
-                return PlanOperationStatusCode.MODIFY_SUCCESS,f"New tasks has been added after task {target_task_id} successfully."
+                
+                tool_call.status = PlanOperationStatusCode.MODIFY_SUCCESS
+                tool_call.tool_output = f"New tasks has been added after task {target_task_id} successfully."
             case 'delete':
                 if target_task.data.status != TaskStatusCode.TODO :
-                    return PlanOperationStatusCode.OTHER_ERROR, f"Cannot delete the task {target_task_id} which is not a TODO task. Nothing happens."
+                    tool_call.status = PlanOperationStatusCode.OTHER_ERROR
+                    tool_call.tool_output = f"Cannot delete the task {target_task_id} which is not a TODO task. Nothing happens."
+                    return tool_call.status,tool_call.tool_output   
                 target_task.father.children.remove(target_task)
                 target_task.father = None
-                return PlanOperationStatusCode.MODIFY_SUCCESS,f"Delete the task {target_task_id} successfully."
                 
+                tool_call.status = PlanOperationStatusCode.MODIFY_SUCCESS
+                tool_call.tool_output = f"Delete the task {target_task_id} successfully."                
             case 'exit':
-                return PlanOperationStatusCode.PLAN_REFINE_EXIT,'Exit the plan rectify process successfully.'
+                tool_call.status = PlanOperationStatusCode.PLAN_REFINE_EXIT
+                tool_call.tool_output = 'Exit the plan rectify process successfully.'
             case _:
-                message = f"Operation {tool_call.tool_args['operation']} not found. Nothing happens."
-                logger.typewriter_log("Error: ", Fore.RED, message)
-                return PlanOperationStatusCode.PLAN_OPERATION_NOT_FOUND,message
-
+                tool_call.tool_output = f"Operation {tool_call.tool_args['operation']} not found. Nothing happens."
+                logger.typewriter_log("Error: ", Fore.RED, tool_call.tool_output)
+                tool_call.status = PlanOperationStatusCode.PLAN_OPERATION_NOT_FOUND
         
-        return PlanOperationStatusCode.OTHER_ERROR,'Unknown error'
-    
+        return tool_call.status,tool_call.tool_output       
     
     async def plan_rectify(self,task:PlanExecutionNode,plan:Plan,exec_result:ExecutionGraph,execution_engine:BaseEngine)->PlanExecutionNode:
         logger.typewriter_log(
@@ -296,7 +318,13 @@ class PlanEngine(BaseEngine):
         except:
             traceback.print_exc()
             file_archi = ""
-            
+        
+        if self.config.enable_summary: 
+            init_message = summarize_plan(task.plan.to_json())
+        else:
+            init_message = orjson.dumps(task.plan.to_json()).decode()
+        init_message =  Message("user", f"""The initial plan and the execution status is:\n{init_message}\n""")
+
         while modify_steps < max_step:
             modify_steps += 1
             logger.typewriter_log(
@@ -305,11 +333,6 @@ class PlanEngine(BaseEngine):
             )
             
             additional_messages = []
-            if self.config.enable_summary: 
-                init_message = summarize_plan(task.plan.to_json())
-            else:
-                init_message = orjson.dumps(task.plan.to_json()).decode()
-            init_message =  Message("user", f"""The initial plan and the execution status is:\n{init_message}\n""")
             additional_messages.append(init_message)
             
             for k, operation in enumerate(operations):
@@ -318,9 +341,9 @@ class PlanEngine(BaseEngine):
             
             if is_modified:
                 if self.config.enable_summary: 
-                    new_message = summarize_plan(plan.to_json())
+                    new_message = summarize_plan(task.plan.to_json())
                 else:
-                    new_message = orjson.dumps(plan.to_json()).decode()
+                    new_message = orjson.dumps(task.plan.to_json()).decode()
                 new_message =  Message("user", f"""The plan after the {modify_steps}\'th step refinement is:\n{new_message}\n""")
             else:
                 new_message = Message("user", f"The total plan stay unchanged")

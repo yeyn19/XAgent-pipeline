@@ -24,9 +24,8 @@ class XAgentServer:
         from XAgent.config import CONFIG as config
         from XAgent.running_recorder import recorder
         from XAgent.tools import ToolServerInterface
-        from XAgent.workflow.base_query import AutoGPTQuery
         from XAgent.engines import PlanEngine,ReActEngine
-        from XAgent.models import PlanExecutionNode
+        from XAgent.models import PlanExecutionNode,AutoGPTQuery
         # from XAgent.workflow.working_memory import WorkingMemoryAgent
         config.reload()
         # args

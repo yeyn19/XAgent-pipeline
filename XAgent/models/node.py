@@ -88,9 +88,17 @@ class ToolCall(BaseModel):
         if self.data["tool_output"] == "":
             return None
         return self.data["tool_output"]
+    @tool_output.setter
+    def tool_output(self,tool_output):
+        self.data["tool_output"] = tool_output
     @property
     def status(self):
         return self.data["tool_status_code"]
+    @status.setter
+    def status(self,status):
+        self.data["tool_status_code"] = status
+        
+
 
     def set_tool(self,tool_name,tool_args):
         self.data["command"]["properties"]["name"] = tool_name

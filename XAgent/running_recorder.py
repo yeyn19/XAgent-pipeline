@@ -7,7 +7,7 @@ import logging
 from copy import deepcopy
 from colorama import Fore, Style
 from XAgent.logs import logger
-from XAgent.workflow.base_query import AutoGPTQuery
+from XAgent.models import AutoGPTQuery
 from XAgent.config import XAgentConfig, CONFIG,ARGS
 
 def dump_common_things(object):
