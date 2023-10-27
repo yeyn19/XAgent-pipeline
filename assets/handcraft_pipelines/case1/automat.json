@@ -47,6 +47,11 @@
             "node_name": "react",
             "tool_name": "ReACT",
             "node_type": "ReACT"
+        },
+        {
+            "node_name": "compute 1+1",
+            "tool_name": "calculator",
+            "node_type": "Custom"
         }
     ],
 
@@ -54,8 +59,8 @@
     "edges":[
         {
             "edge_name":"1",
-            "from_node": "send gmail",
-            "to_node": "slack send message",
+            "from_node": "print_file_system_2",
+            "to_node": "compute 1+1",
             "comments": []
         },
         {
@@ -78,7 +83,7 @@
         },
         {
             "edge_name":"5",
-            "from_node": "print_file_system_2",
+            "from_node": "compute 1+1",
             "to_node": "react",
             "comments": []
         }

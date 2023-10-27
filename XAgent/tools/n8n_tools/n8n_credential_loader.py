@@ -3,7 +3,7 @@ import json
 from typing import Dict, Any
 
 class n8nCredentials():
-    def __init__(self, base_file_path= "./XAgent/tools/n8n_tools/credentials"):
+    def __init__(self, base_file_path= "./XAgent/tools/n8n_tools/n8n_credentials"):
         with open(os.path.join(base_file_path,"c.json"),"r") as reader:
             credential_data = json.load(reader)
             self.credential_data: Dict[str,Any] = {}

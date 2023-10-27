@@ -49,13 +49,13 @@ if __name__ == '__main__':
 
     CONFIG.reload(config_file="assets/private.yml")
 
-    # pipeline_engine = PipelineV2Engine(CONFIG)
-    # pipeline_engine.lazy_init(CONFIG)
-    # task = TaskNode(
-    #     pipeline_dir = "assets/handcraft_pipelines/case1"
-    # )
-    # asyncio.run(pipeline_engine.run(task))
-    # exit()
+    pipeline_engine = PipelineV2Engine(CONFIG)
+    pipeline_engine.lazy_init(CONFIG)
+    task = TaskNode(
+        pipeline_dir = "assets/handcraft_pipelines/case1"
+    )
+    asyncio.run(pipeline_engine.run(task))
+    exit()
     
     if args.get('quiet',False):
         original_stdout = sys.stdout

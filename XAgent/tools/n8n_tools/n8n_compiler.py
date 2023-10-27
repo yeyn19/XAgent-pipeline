@@ -4,7 +4,6 @@ from copy import deepcopy
 
 from XAgent.logs import logger
 from XAgent.config import CONFIG
-from XAgent.engines.param_system import ParamSystem
 from .n8n_utils import NodeType, n8nNodeMeta
 from .n8n_node import n8nPythonNode
 from .n8n_param_parser import parse_properties
@@ -16,7 +15,7 @@ class n8nCompiler():
 
 
     def __init__(self,config):
-        self.resolve(config)
+        self.resolve()
 
 
 
@@ -77,6 +76,17 @@ class n8nCompiler():
 
         return integration_data
 
+    def get_available_tools(self):
+        tool_names,tool_des = [],[]
+        for k1, integration_name in enumerate(list(self.flattened_tools.keys())):
+            data = self.flattened_tools[integration_name]["data"]
+            des = self.flattened_tools[integration_name]["meta"]["description"]
+            for k2,resource in enumerate(list( data.keys())):
+                for k3, operation in enumerate(list(data[resource].keys())):
+                    tool_names.append(f"{integration_name}.{resource}.{operation}")
+                    tool_des.append({})
+        return tool_names, tool_des
+
     def print_flatten_tools(self):
         output_description_list = []
         for k1, integration_name in enumerate(list(self.flattened_tools.keys())):
@@ -103,7 +113,7 @@ class n8nCompiler():
         self.json_data = []
         self.flattened_tools = {}
         white_list = CONFIG.n8n_whitelist
-        nodes_json_path = "./tools/n8n_tools/n8n_nodes.json"
+        nodes_json_path = "./XAgent/tools/n8n_tools/n8n_nodes.json"
 
         available_integrations = [item.split(".")[0] for item in white_list]
         with open(nodes_json_path, "r", encoding="utf-8") as reader:
