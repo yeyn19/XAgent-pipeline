@@ -306,9 +306,9 @@ class PlanEngine(BaseEngine):
             
             additional_messages = []
             if self.config.enable_summary: 
-                init_message = summarize_plan(plan.to_json())
+                init_message = summarize_plan(task.plan.to_json())
             else:
-                init_message = orjson.dumps(plan.to_json()).decode()
+                init_message = orjson.dumps(task.plan.to_json()).decode()
             init_message =  Message("user", f"""The initial plan and the execution status is:\n{init_message}\n""")
             additional_messages.append(init_message)
             
