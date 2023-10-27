@@ -232,6 +232,11 @@ class PlanEngine(BaseEngine):
         
         tool_call.status,tool_call.tool_output = PlanOperationStatusCode.OTHER_ERROR,'Unknown error'
         
+        if tool_call.tool_args['operation'] == 'exit':
+            tool_call.status = PlanOperationStatusCode.PLAN_REFINE_EXIT
+            tool_call.tool_output = 'Exit the plan rectify process successfully.'
+            return tool_call.status,tool_call.tool_output
+        
         if target_task_id < current_task_id:
             tool_call.tool_output = f"Cannot modify the task {target_task_id} which is before the current task {current_task_id}. Nothing happens." 
             tool_call.status = PlanOperationStatusCode.MODIFY_FORMER_PLAN
@@ -286,9 +291,7 @@ class PlanEngine(BaseEngine):
                 
                 tool_call.status = PlanOperationStatusCode.MODIFY_SUCCESS
                 tool_call.tool_output = f"Delete the task {target_task_id} successfully."                
-            case 'exit':
-                tool_call.status = PlanOperationStatusCode.PLAN_REFINE_EXIT
-                tool_call.tool_output = 'Exit the plan rectify process successfully.'
+
             case _:
                 tool_call.tool_output = f"Operation {tool_call.tool_args['operation']} not found. Nothing happens."
                 logger.typewriter_log("Error: ", Fore.RED, tool_call.tool_output)
