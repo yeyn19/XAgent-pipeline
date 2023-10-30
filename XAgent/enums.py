@@ -104,3 +104,4 @@ class RequiredAbilities(Enum):
     task_evaluator = 'task_evaluator'
     summarization = 'summarization'
     reflection = 'reflection'
+    route_pipeline = "route_pipeline"

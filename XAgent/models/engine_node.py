@@ -1,3 +1,5 @@
+from dataclasses import field
+
 from XAgent.enums import ToolCallStatusCode,TaskStatusCode
 
 from .node import ToolCall
@@ -17,6 +19,11 @@ class PlanExecutionNode(TaskNode):
     task:str = None
     actions:list[ToolCall] = None
     status_code: TaskStatusCode = TaskStatusCode.TODO
+
+class PipelineTaskNode(TaskNode):
+    pipeline_dir: str = None
+    overall_task_description: str = None
+    pipeline_input_params: dict = field(default_factory=dict)
     
 class PlanExecutionGraph(ExecutionGraph):
     pass

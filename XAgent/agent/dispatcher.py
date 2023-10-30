@@ -63,6 +63,8 @@ class XAgentDispatcher(AgentDispatcher):
             from .tool_agent import get_examples_for_dispatcher
         elif ability_type == RequiredAbilities.reflection:
             from .reflect_agent import get_examples_for_dispatcher
+        elif ability_type == RequiredAbilities.route_pipeline:
+            from .route_agent import get_examples_for_dispatcher
         return get_examples_for_dispatcher()
 
     def build_agent(

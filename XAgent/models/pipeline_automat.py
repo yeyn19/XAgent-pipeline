@@ -23,6 +23,7 @@ class AutoMatStateChangeHardness(Enum):
 @unique
 class ExecutionNodeTypeForPipelineUserInterface(Enum):
     Start = "Start"
+    End = "End"
     BuiltIn = 'BuildIn' #Xagent工具
     ToolServer = 'ToolServer'
     Rapid = 'Rapid'
@@ -44,12 +45,12 @@ class PipelineRouteType(Enum):
 
 @dataclass
 class PipelineRouteResult():
-    select_this_edge: bool
-    from_node: "PipelineAutoMatNode"
-    to_node: "PipelineAutoMatNode"
-    select_edge: "PipelineAutoMatEdge"
-    provide_params: dict
-    param_sufficient: bool
+    select_this_edge: bool = False
+    from_node: Optional["PipelineAutoMatNode"] = None
+    to_node: Optional["PipelineAutoMatNode"] = None
+    select_edge: Optional["PipelineAutoMatEdge"] = None
+    provide_params: dict = field(default_factory=dict)
+    param_sufficient: bool = False
 
 @dataclass
 class PipelineRuntimeNode():
@@ -69,6 +70,8 @@ class PipelineAutoMatNode(ExecutionNode):
     node_name: str
     tool_name: str
     node_type: ExecutionNodeTypeForPipelineUserInterface
+    comments: List[str] = field(default_factory=list)
+
     state_change_hardness: AutoMatStateChangeHardness = AutoMatStateChangeHardness.GPT4
 
     route: Optional[Callable] = None
@@ -84,8 +87,19 @@ class PipelineAutoMatNode(ExecutionNode):
                         tool_name=node["tool_name"],
                         node_type=ExecutionNodeTypeForPipelineUserInterface(node["node_type"]),
                     )
-        # TODO: other params?
+        if "comments" in node.keys():
+            new_node.comments = node["comments"]
+
         return new_node
+
+    def to_json(self, comments = True):
+        data = {
+            "name": self.node_name,
+            "tool_name": self.tool_name,
+        }
+        if self.comments != [] and comments:
+            data["suggestions for edge selections"] = self.comments
+        return data
 
     @staticmethod
     def get_defualt_ReACT_node():
@@ -104,7 +118,7 @@ class PipelineAutoMatNode(ExecutionNode):
 
 class PipelineAutoMatEdge(DirectedEdge):
     edge_name: str = ""
-    comments: List[str] = field(default_factory=List)
+    comments: List[str] = field(default_factory=list)
 
     route: Optional[Callable] = None
 
@@ -118,7 +132,12 @@ class PipelineAutoMatEdge(DirectedEdge):
         return new_edge
 
     def to_json(self):
-        pass
+        data = {
+            "edge_name": self.edge_name,
+        }
+        if self.comments != []:
+            data["reason to select this edge"] = self.comments
+        return data
 
 
 
@@ -127,7 +146,8 @@ class PipelineMeta():
     name: str
     purpose: str
     author: str
-    params: dict
+    input_params: dict
+    output_params: dict
     
     @staticmethod
     def from_json(meta_data):
@@ -135,7 +155,8 @@ class PipelineMeta():
             name=meta_data["name"],
             purpose=meta_data["purpose"],
             author=meta_data["author"],
-            params = meta_data["params"]
+            input_params = meta_data["input_params"],
+            output_params = meta_data["output_params"]
         )
 
 
@@ -147,6 +168,15 @@ class PipelineAutoMat(ExecutionGraph):
     meta: PipelineMeta = None
     runtime_info: PipelineRuntimeStackUserInterface = PipelineRuntimeStackUserInterface() #存储自动机的运行时信息
 
+    def describe_outedge_json(self, now_node: PipelineAutoMatNode):    
+        output_data = []
+        out_node_ids =  self.get_adjacent_node(now_node)
+        for out_node_id in out_node_ids:
+            edge: PipelineAutoMatEdge = self.edges[now_node.node_id][out_node_id]
+            edge_info = edge.to_json()
+            edge_info["out_node"] = self[out_node_id].to_json(comments=False)
+            output_data.append(edge_info)
+        return output_data
 
 
     @staticmethod
@@ -171,13 +201,20 @@ class PipelineAutoMat(ExecutionGraph):
 
             automat.add_node(new_node)
             if new_node.node_type == ExecutionNodeTypeForPipelineUserInterface.Start:
-                automat.begin_node = new_node
+                automat.begin_node = new_node.node_id
+                new_node.begin_node = True
+            elif new_node.node_type == ExecutionNodeTypeForPipelineUserInterface.End:
+                automat.end_node = new_node.node_id
+                new_node.end_node = True
+
             
         for edge in json_data["edges"]:
             new_edge = PipelineAutoMatEdge(
                 edge_name=edge["edge_name"],
-                comments=edge["comments"],
             )
+            if "comments" in edge.keys():
+                new_edge.comments = edge["comments"]
+
             from_name = edge["from_node"]
             to_name = edge["to_node"]
             from_node, to_node = None, None

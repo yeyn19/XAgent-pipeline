@@ -21,7 +21,7 @@ def clip_text(text:str,max_tokens:int=None,clip_end=False)->str|int:
         decoded = decoded + '`wrapped`' if clip_end else '`wrapped`' + decoded
     return decoded, len(encoded)
 
-def has_route_function(obj):
+def has_user_provide_route_function(obj):
     if not hasattr(obj,"route"):
         return False
     if not callable(getattr(obj, 'route')):

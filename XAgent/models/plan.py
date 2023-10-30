@@ -80,11 +80,12 @@ class Plan(BaseModel):
 
     @staticmethod
     def get_single_subtask_plan_from_task(query: str):
-        plan = Plan()
-        plan.data = TaskSaveItem(
-            name="handle the given task",
-            goal=query,
-            milestones=[],
-            prior_plan_criticism=""
+        plan = Plan(
+            data = TaskSaveItem(
+                name="handle the given task",
+                goal=query,
+                milestones=[],
+                prior_plan_criticism=""
+            )
         )
         return plan

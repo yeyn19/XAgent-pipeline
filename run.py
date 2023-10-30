@@ -7,8 +7,8 @@ import asyncio
 from copy import deepcopy
 
 from command import CommandLine,XAgentServerEnv
-from XAgent.engines import PipelineV2Engine
-from XAgent.models import TaskNode
+from XAgent.engines import PipelineEngine
+from XAgent.models import PipelineTaskNode
 from XAgent.config import CONFIG,ARGS
 
 def parse_args():
@@ -49,13 +49,15 @@ if __name__ == '__main__':
 
     CONFIG.reload(config_file="assets/private.yml")
 
-    # pipeline_engine = PipelineV2Engine(CONFIG)
-    # pipeline_engine.lazy_init(CONFIG)
-    # task = TaskNode(
-    #     pipeline_dir = "assets/handcraft_pipelines/case1"
-    # )
-    # asyncio.run(pipeline_engine.run(task))
-    # exit()
+    pipeline_engine = PipelineEngine(CONFIG)
+    pipeline_engine.lazy_init(CONFIG)
+    task = PipelineTaskNode(
+        pipeline_dir = "assets/handcraft_pipelines/case2",
+        overall_task_description = "搜索一些关于英雄联盟s13瑞士轮比赛的信息，需要把目前已经晋级的队伍都记录下来",
+        pipeline_input_params = {},
+    )
+    asyncio.run(pipeline_engine.run(task))
+    exit()
     
     if args.get('quiet',False):
         original_stdout = sys.stdout

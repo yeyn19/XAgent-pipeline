@@ -4,7 +4,7 @@ from XAgent.config import CONFIG
 
 from XAgent.logs import logger,print_assistant_thoughts
 from XAgent.agent.summarize import summarize_action,summarize_plan,clip_text
-from XAgent.global_vars import INTERRUPT,agent_dispatcher
+from XAgent.global_vars import INTERRUPT, agent_dispatcher
 from XAgent.ai_functions import function_manager
 from XAgent.tools import ToolServerInterface,BuiltInInterface
 

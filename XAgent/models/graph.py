@@ -32,7 +32,6 @@ class ExecutionNode(BaseModel):
 class TaskNode(ExecutionNode):
     plan:Plan = None
     begin_node:bool = True
-    pipeline_dir: str = None
 
 class DirectedEdge(BaseModel):
     edge_id:GID  = Field(default_factory=assign_gid)

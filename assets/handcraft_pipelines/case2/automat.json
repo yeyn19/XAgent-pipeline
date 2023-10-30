@@ -1,0 +1,111 @@
+{
+    "meta": {
+        "name": "collect information from website",
+        "purpose": "Collect information from website, achieve this goal with web brosing tools. You need to first search relative infos, and decide whether to additionally or search other things, or finish the search. You need to write useful informations in a txt file",
+        "overall task information": "",
+        "input_params": {
+            "parameters": {
+                
+            }
+        },
+        "output_params": {
+
+        },
+        "author": ""
+    },
+    "nodes": [
+        {
+            "node_name": "start",
+            "tool_name": "Start",
+            "node_type": "Start"
+        },
+        {
+            "node_name": "end",
+            "tool_name": "End",
+            "node_type": "End"
+        },
+        {
+            "node_name": "search",
+            "tool_name": "WebEnv_search_and_browse",
+            "node_type": "ToolServer"
+        },
+        {
+            "node_name": "browse",
+            "tool_name": "WebEnv_browse_website",
+            "node_type": "ToolServer"
+        },
+        {
+            "node_name": "write",
+            "tool_name": "FileSystemEnv_write_to_file",
+            "node_type": "ToolServer"
+        }
+    ],
+
+
+    "edges":[
+        {
+            "edge_name":"start_search",
+            "from_node": "start",
+            "to_node": "search",
+            "comments": [
+                "first search relative topic based on your task"
+            ]
+        },
+        {
+            "edge_name":"search_other_content",
+            "from_node": "search",
+            "to_node": "search",
+            "comments": [
+                "search other content if you find the all the now search results are not relevant"
+            ]
+        },
+        {
+            "edge_name":"browse_content",
+            "from_node": "search",
+            "to_node": "browse",
+            "comments": [
+                "If you find things interesting in search results whose id>3 and want to get details. Don't choose it unless necessary"
+            ]
+        },
+        {
+            "edge_name":"browse_other_content",
+            "from_node": "browse",
+            "to_node": "browse",
+            "comments": [
+                "If you think this content is nothing special and you want to browse other contents whose id>3"
+            ]
+        },
+        {
+            "edge_name":"back_to_search",
+            "from_node": "browse",
+            "to_node": "search",
+            "comments": [
+                "If you think all the search items are not interesting and you want to search other items"
+            ]
+        },
+        {
+            "edge_name":"write content from first 3 result",
+            "from_node": "search",
+            "to_node": "write",
+            "comments": [
+                "Write important information collected from first 3 items if relevant"
+            ]
+        },
+        {
+            "edge_name":"write content from deatailed result",
+            "from_node": "browse",
+            "to_node": "write",
+            "comments": [
+                "Write important information collected from the detailed result"
+            ]
+        },
+        {
+            "edge_name":"data collection success",
+            "from_node": "write",
+            "to_node": "end",
+            "comments": [
+                "after you find enough information, submit the task and exit"
+            ]
+        }
+    ]
+}

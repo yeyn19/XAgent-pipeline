@@ -2,9 +2,9 @@
 #from XAgent.vector_db import VectorDBInterface
 # from XAgent.running_recorder import RunningRecoder
 from XAgent.config import CONFIG as __config
-from XAgent.agent import agent_dispatcher,PlanGenerateAgent, PlanRefineAgent,ReflectAgent, ToolAgent
+from XAgent.agent import agent_dispatcher,PlanGenerateAgent, PlanRefineAgent,ReflectAgent, ToolAgent, RouteAgent
 
-for agent in [PlanGenerateAgent,PlanRefineAgent,ToolAgent,ReflectAgent,]:
+for agent in [PlanGenerateAgent,PlanRefineAgent,ToolAgent,ReflectAgent,RouteAgent]:
     agent_dispatcher.regist_agent(agent)
 
 
